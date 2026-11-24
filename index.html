@@ -34,13 +34,13 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);f
 </style></head><body>
 <header><div class="wrap"><nav><img src="assets/logo.png" alt="QR logo"><b>QR-SimBench</b><span class="sp"></span>
 <a href="#replay">3D replay</a><a href="#scenarios">Scenarios</a><a href="#evidence">Evidence</a><a href="#start">Quick start</a>
-<a href="#data">Data</a><a href="https://github.com/quanrobotics/qr-simbench">GitHub</a></nav></div></header>
+<a href="#data">Data</a><a href="https://github.com/quanroboticsofficial/qr-simbench">GitHub</a></nav></div></header>
 <main class="wrap">
 <div class="hero"><h1>Scenario-to-evidence validation for mobile robots</h1>
 <p>Describe a robot test once in YAML. QR-SimBench runs it in Gazebo with Nav2, injects the condition you want to test, records
 everything to MCAP, computes metrics, gives a PASS / WARN / FAIL engineering verdict and writes an evidence report you can compare
 and reproduce. Open source, Apache-2.0.</p>
-<a class="btn p" href="https://github.com/quanrobotics/qr-simbench">View on GitHub</a><a class="btn" href="#start">Quick start</a><a class="btn" href="#replay">Watch a run</a>
+<a class="btn p" href="https://github.com/quanroboticsofficial/qr-simbench">View on GitHub</a><a class="btn" href="#start">Quick start</a><a class="btn" href="#replay">Watch a run</a>
 <a class="btn" href="https://qr-sim.quanrobotics.org">QR-Sim (hosted product)</a>
 <div class="pipe"><span>YAML scenario</span><i>→</i><span>Gazebo + Nav2 run</span><i>→</i><span>injected event</span><i>→</i><span>MCAP recording</span>
 <i>→</i><span>metrics</span><i>→</i><span>PASS / WARN / FAIL</span><i>→</i><span>evidence report</span><i>→</i><span>compare · reproduce · replay</span></div></div>
@@ -59,7 +59,7 @@ its evidence report and the full run data.</p>
   <p class="small">time to goal 28.3 s · min clearance 0.73 m · <code>MISSION_SUCCESS</code></p>
   <div class="links"><a href="replay/index.html?run=2026-11-24T072318_baseline" target="replay" data-run="2026-11-24T072318_baseline">3D replay</a>
   <a href="reports/baseline/report.html">Evidence report</a><a href="data/baseline.zip">Run data (.zip)</a>
-  <a href="https://github.com/quanrobotics/qr-simbench/blob/main/examples/warehouse_amr/scenarios/baseline.yaml">Scenario YAML</a></div>
+  <a href="https://github.com/quanroboticsofficial/qr-simbench/blob/main/examples/warehouse_amr/scenarios/baseline.yaml">Scenario YAML</a></div>
 </article>
 <article class="card">
   <div class="row"><h3>Blocked aisle</h3><span class="v v-PASS">PASS</span></div>
@@ -67,7 +67,7 @@ its evidence report and the full run data.</p>
   <p class="small">time to goal 35.3 s · min clearance 0.60 m · <code>MISSION_SUCCESS</code></p>
   <div class="links"><a href="replay/index.html?run=2026-11-24T072414_blocked_aisle" target="replay" data-run="2026-11-24T072414_blocked_aisle">3D replay</a>
   <a href="reports/blocked_aisle/report.html">Evidence report</a><a href="data/blocked_aisle.zip">Run data (.zip)</a>
-  <a href="https://github.com/quanrobotics/qr-simbench/blob/main/examples/warehouse_amr/scenarios/blocked_aisle.yaml">Scenario YAML</a></div>
+  <a href="https://github.com/quanroboticsofficial/qr-simbench/blob/main/examples/warehouse_amr/scenarios/blocked_aisle.yaml">Scenario YAML</a></div>
 </article>
 <article class="card">
   <div class="row"><h3>Narrow aisle</h3><span class="v v-PASS">PASS</span></div>
@@ -75,7 +75,7 @@ its evidence report and the full run data.</p>
   <p class="small">time to goal 26.3 s · min clearance 0.36 m · <code>MISSION_SUCCESS</code></p>
   <div class="links"><a href="replay/index.html?run=2026-11-24T073706_narrow_aisle" target="replay" data-run="2026-11-24T073706_narrow_aisle">3D replay</a>
   <a href="reports/narrow_aisle/report.html">Evidence report</a><a href="data/narrow_aisle.zip">Run data (.zip)</a>
-  <a href="https://github.com/quanrobotics/qr-simbench/blob/main/examples/warehouse_amr/scenarios/narrow_aisle.yaml">Scenario YAML</a></div>
+  <a href="https://github.com/quanroboticsofficial/qr-simbench/blob/main/examples/warehouse_amr/scenarios/narrow_aisle.yaml">Scenario YAML</a></div>
 </article>
 <article class="card">
   <div class="row"><h3>Impossible route</h3><span class="v v-FAIL">FAIL</span></div>
@@ -83,7 +83,7 @@ its evidence report and the full run data.</p>
   <p class="small">min clearance 0.41 m · <code>TIMEOUT</code></p>
   <div class="links"><a href="replay/index.html?run=2026-11-24T073805_impossible_route" target="replay" data-run="2026-11-24T073805_impossible_route">3D replay</a>
   <a href="reports/impossible_route/report.html">Evidence report</a><a href="data/impossible_route.zip">Run data (.zip)</a>
-  <a href="https://github.com/quanrobotics/qr-simbench/blob/main/examples/warehouse_amr/scenarios/impossible_route.yaml">Scenario YAML</a></div>
+  <a href="https://github.com/quanroboticsofficial/qr-simbench/blob/main/examples/warehouse_amr/scenarios/impossible_route.yaml">Scenario YAML</a></div>
 </article></div></section>
 
 <section id="evidence"><h2>Evidence you can check</h2><div class="two">
@@ -95,7 +95,7 @@ software versions, hardware and the command used.</p>
 <tr><td>path length / efficiency</td><td>distance driven; straight line ÷ driven</td></tr>
 <tr><td>min clearance</td><td>closest LiDAR return while moving (proxy)</td></tr>
 <tr><td>stopped time</td><td>time stopped after start-up</td></tr><tr><td>goal error</td><td>final distance to the goal</td></tr></table>
-<p class="small">Full definitions: <a href="https://github.com/quanrobotics/qr-simbench/blob/main/docs/metrics.md">docs/metrics.md</a>. Compare two runs:
+<p class="small">Full definitions: <a href="https://github.com/quanroboticsofficial/qr-simbench/blob/main/docs/metrics.md">docs/metrics.md</a>. Compare two runs:
 <a href="reports/compare.html">blocked aisle vs clear route</a>.</p></div>
 <div><a href="reports/blocked_aisle/report.html"><img class="shot" src="assets/report.png" alt="Evidence report of the blocked-aisle run"></a>
 <p class="small">Evidence report of the blocked-aisle run (click to open).</p></div></div></section>
@@ -103,7 +103,7 @@ software versions, hardware and the command used.</p>
 <section id="start"><h2>Quick start</h2>
 <p class="lead">Ubuntu 22.04 or 24.04, no sudo. The ROS 2 Jazzy + Gazebo Harmonic + Nav2 environment installs into the repository
 folder from conda-forge / RoboStack (about 10 GB).</p>
-<pre><code>git clone https://github.com/quanrobotics/qr-simbench && cd qr-simbench
+<pre><code>git clone https://github.com/quanroboticsofficial/qr-simbench && cd qr-simbench
 mamba env create -p ./env -f environment.ros.yml
 source activate.sh && pip install --no-deps -e .
 qrsimbench doctor
@@ -128,12 +128,12 @@ Verdicts are engineering validation results, not a safety certification, and do 
 <section><h2>Cite</h2><pre><code>@software{qrsimbench,
   title  = {QR-SimBench: scenario-to-evidence validation for mobile robots},
   author = {{QR}},
-  url    = {https://github.com/quanrobotics/qr-simbench},
+  url    = {https://github.com/quanroboticsofficial/qr-simbench},
   year   = {2026}
 }</code></pre></section>
 </main>
 <footer><div class="wrap">QR-SimBench is built and maintained by <a href="https://www.quanrobotics.org">QR</a> ·
-<a href="https://github.com/quanrobotics/qr-simbench">GitHub</a> · <a href="https://qr-sim.quanrobotics.org">QR-Sim</a> · Apache-2.0 ·
+<a href="https://github.com/quanroboticsofficial/qr-simbench">GitHub</a> · <a href="https://qr-sim.quanrobotics.org">QR-Sim</a> · Apache-2.0 ·
 Built on ROS 2, Gazebo, Nav2 and MCAP (not QR technology). The QR name and logo are trademarks of QR.</div></footer>
 <script>
 document.querySelectorAll('a[data-run]').forEach(a=>a.addEventListener('click',()=>{document.getElementById('replay').scrollIntoView({behavior:'smooth'})}));
