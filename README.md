@@ -10,7 +10,7 @@ YAML scenario → Gazebo + Nav2 run → injected event → MCAP recording → me
 ```
 
 **Project page with live 3D replays, evidence reports and recorded data:
-[quanrobotics.github.io/qr-simbench](https://quanrobotics.github.io/qr-simbench/)**
+[quanroboticsofficial.github.io/qr-simbench](https://quanroboticsofficial.github.io/qr-simbench/)**
 
 <p align="center">
   <img src="docs/assets/replay.gif" alt="3D replay of the blocked-aisle run: a pallet appears and the robot replans around it" width="800"><br>
@@ -38,7 +38,7 @@ reproduction, stress campaigns, world builder and importers, and the robot-data 
 ## Install (Ubuntu 22.04 or 24.04, no sudo, NVIDIA GPU recommended)
 
 ```bash
-git clone https://github.com/quanrobotics/qr-simbench && cd qr-simbench
+git clone https://github.com/quanroboticsofficial/qr-simbench && cd qr-simbench
 mamba env create -p ./env -f environment.ros.yml   # ROS 2 Jazzy + Gazebo Harmonic + Nav2 via RoboStack (~10 GB)
 source activate.sh
 pip install --no-deps -e .
