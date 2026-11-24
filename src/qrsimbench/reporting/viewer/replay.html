@@ -345,6 +345,8 @@ async function load(runId) {
   D = await r.json();
   $("stack").textContent = params.get("label") || `${D.stack} · ${D.world.replace(/^qr_/, "").replace(/_/g, " ")}`;
   if (EMBED) { $("kp_rate").style.display = "none"; $("kp_calls").style.display = ""; }
+  const noPeople = !Object.keys(D.kinds || {}).length; // no workers or vehicles: hide people KPIs
+  $("kp_close").style.display = noPeople ? "none" : ""; $("k_contact").parentElement.style.display = noPeople ? "none" : "";
   const site = buildSite(D.layout);
   spawned = (D.spawns || []).map((o) => { const g = box(o.sx, o.h, o.sy, M.pallet); g.position.copy(P(o.x, o.y, o.h / 2));
     g.rotation.y = o.yaw || 0; g.visible = false; scene.add(g); return [o.t, g]; });

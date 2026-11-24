@@ -9,6 +9,19 @@ and reproduce.
 YAML scenario → Gazebo + Nav2 run → injected event → MCAP recording → metrics → PASS/WARN/FAIL → HTML report → compare → reproduce
 ```
 
+**Project page with live 3D replays, evidence reports and recorded data:
+[quanrobotics.github.io/qr-simbench](https://quanrobotics.github.io/qr-simbench/)**
+
+<p align="center">
+  <img src="docs/assets/replay.gif" alt="3D replay of the blocked-aisle run: a pallet appears and the robot replans around it" width="800"><br>
+  <em>`qrsimbench replay`: the blocked-aisle run. A pallet appears in the aisle and Nav2 replans around it.</em>
+</p>
+
+<p align="center">
+  <img src="docs/assets/report.png" alt="HTML evidence report of the blocked-aisle run" width="800"><br>
+  <em>The evidence report every run writes: verdict, metrics, trajectory, velocity, clearance, events, gates, provenance.</em>
+</p>
+
 QR-SimBench is built and maintained by [QR](https://www.quanrobotics.org). It powers
 [QR-Sim](https://qr-sim.quanrobotics.org), our hosted product.
 
