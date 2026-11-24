@@ -10,6 +10,7 @@ import sys
 import time
 from pathlib import Path
 
+from qrsimbench import fleet_managers
 from qrsimbench.analysis.bag_reader import GT_TOPIC, fleet_ids, read_run
 from qrsimbench.analysis.metrics import compute_metrics
 from qrsimbench.analysis.verdict import evaluate
@@ -135,22 +136,6 @@ def sim_command(resolved: dict, params_file: Path | None = None, record: bool = 
 
 
 INFRA_CODES = {"NAV_STACK_NOT_READY", "SIMULATOR_START_FAILURE", "RECORDING_FAILURE"}
-
-
-def start_rmf(resolved: dict, run_dir: Path, logs: Path) -> list[Child]:
-    """Open-RMF baseline: traffic schedule node + our EasyFullControl adapter (it writes mission files)."""
-    from qrsimbench.baselines.rmf_graph import STATION_TO_VERTEX, write
-
-    world = resolved["resolved_profiles"]["world"]
-    robots = {m["id"]: STATION_TO_VERTEX[m["start"]] for m in resolved["fleet"]}
-    max_speed = ((resolved.get("navigation", {}).get("overrides") or {}).get("controller_server", {})
-                 .get("ros__parameters", {}).get("FollowPath", {}).get("vx_max", 0.5))
-    write(REPO_ROOT / world["layout"], run_dir, robots, max_speed=max_speed)
-    schedule = Child("rmf_schedule", ["ros2", "run", "rmf_traffic_ros2", "rmf_traffic_schedule"], logs,
-                     cwd=run_dir)  # the schedule node writes its state file into its working directory
-    adapter = Child("rmf_adapter", [sys.executable, "-m", "qrsimbench.baselines.rmf_adapter", str(run_dir)],
-                    logs)
-    return [adapter, schedule]
 
 
 def _fleet_settled(run_dir: Path, ids: list[str]) -> bool:
@@ -309,28 +294,15 @@ def run_experiment(scenario_path: Path, argv: list[str], headless: bool = False)
                                *topics], logs)
         log(f"simulator + recorder started ({len(ids) or 1} robot(s)); waiting for Nav2")
         timeout = resolved["mission"]["timeout_seconds"] + 240 + 30 * len(ids)  # + bringup allowance
-        if ids and resolved.get("fleet_manager") in ("rmf", "free_fleet", "mapf") and not _has("baselines"):
-            raise RuntimeError(f"fleet_manager {resolved['fleet_manager']!r} needs the baselines package, "
-                               "which is not part of this build")
-        if ids and resolved.get("fleet_manager") in ("rmf", "free_fleet"):
-            # Fleet managers that register all robots at start-up get them once every robot's Nav2 is up
-            # (with staggered bring-up of large fleets, free_fleet aborts if a robot is late).
+        mgr = resolved.get("fleet_manager") or "qr"
+        ext = fleet_managers.find(mgr) if ids and mgr != "qr" else None
+        if ids and mgr != "qr" and ext is None:
+            raise RuntimeError(f"fleet_manager {mgr!r} is not available in this build (no plugin registered "
+                               "under the qrsimbench.fleet_managers entry point)")
+        if ext is not None and mgr in getattr(ext, "WAIT_FOR_NAV2", ()):
             wait_nav2_ready(ids, timeout=120 + 30 * len(ids))
-        if ids and resolved.get("fleet_manager") == "rmf":
-            cmdrs = start_rmf(resolved, run_dir, logs)
-        elif ids and resolved.get("fleet_manager") == "mapf":
-            cmdrs = [Child("mission_mapf", [sys.executable, "-m", "qrsimbench.baselines.mapf", str(run_dir)],
-                           logs)]
-        elif ids and resolved.get("fleet_manager") == "free_fleet":
-            from qrsimbench.baselines.free_fleet import processes
-
-            max_speed = ((resolved.get("navigation", {}).get("overrides") or {}).get("controller_server", {})
-                         .get("ros__parameters", {}).get("FollowPath", {}).get("vx_max", 0.5))
-            cmdrs = []
-            for name, cmd, env in processes(resolved, run_dir, max_speed):
-                cmdrs.append(Child(name, cmd, logs, env=env, cwd=run_dir))
-                time.sleep(1.0)
-            cmdrs.reverse()  # wait on the tracker first; it decides when the mission is over
+        if ext is not None:
+            cmdrs = ext.start(mgr, resolved, run_dir, logs)
         else:
             cmdrs = [Child(f"mission_{i}" if i else "mission",
                            [sys.executable, "-m", "qrsimbench.navigation.mission", str(run_dir),
@@ -338,7 +310,7 @@ def run_experiment(scenario_path: Path, argv: list[str], headless: bool = False)
         deadline = time.time() + timeout
         guard = None  # memory guard: one runaway process must not get the whole queue OOM-killed
         for c in cmdrs:
-            if c.name in ("rmf_schedule", "ff_zenohd", "ff_bridge", "ff_schedule", "ff_adapter"):
+            if ext is not None and c.name in getattr(ext, "BACKGROUND", ()):
                 continue
             while (guard is None and time.time() < deadline and c.wait(timeout=5.0) is None
                    and not _fleet_settled(run_dir, ids)):

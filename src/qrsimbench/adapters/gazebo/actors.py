@@ -189,7 +189,7 @@ def main(run_dir: str) -> int:
     # Crowd behaviour: each time a robot comes near, an actor yields with this probability (decided
     # once per encounter, seeded from the run so runs differ but are reproducible from the log).
     p_yield = float(sc.get("world", {}).get("actor_yield_probability", 1.0))
-    # Optional: forklifts and workers also give way to each other. Off by default so recorded benchmark runs
+    # Optional: forklifts and workers also give way to each other. Off by default so recorded runs
     # reproduce (their scripted forklift and workers do not avoid each other where routes cross).
     actors_yield = bool(sc.get("world", {}).get("vehicles_yield_to_workers", False))
     sim = ActorSim(followers, kinds, stubborn=stubborn, p_yield=p_yield, actors_yield=actors_yield,
