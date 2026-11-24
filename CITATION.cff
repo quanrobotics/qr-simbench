@@ -5,7 +5,7 @@ type: software
 authors:
   - name: "QR"
     website: "https://www.quanrobotics.org"
-repository-code: "https://github.com/quanrobotics/qr-simbench"
+repository-code: "https://github.com/quanroboticsofficial/qr-simbench"
 url: "https://qr-sim.quanrobotics.org"
 license: Apache-2.0
 version: 0.2.0
