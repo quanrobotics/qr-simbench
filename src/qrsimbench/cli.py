@@ -131,6 +131,25 @@ def report(run_id: str) -> None:
 
 
 @app.command()
+def replay(
+    run_ids: list[str] = typer.Argument(..., help="run ids, paths or latest:<scenario>"),
+    out: Path = typer.Option(None, "--out", help="output folder (default: <first run>/replay)"),
+    port: int = typer.Option(8766, "--port"),
+    no_serve: bool = typer.Option(False, "--no-serve", help="only write the replay site"),
+    no_browser: bool = typer.Option(False, "--no-browser"),
+) -> None:
+    """3D replay of recorded runs in the browser (robots, people, spawned objects, task progress)."""
+    from qrsimbench.reporting.compare import resolve_run
+    from qrsimbench.reporting.replay import export_replay, serve
+
+    dirs = [resolve_run(r) for r in run_ids]
+    index = export_replay(dirs, out or dirs[0] / "replay")
+    typer.echo(f"replay site: {index}")
+    if not no_serve:
+        serve(index.parent, port=port, open_browser=not no_browser)
+
+
+@app.command()
 def compare(run_a: str, run_b: str) -> None:
     """Compare two runs (ids, paths or latest:<scenario>) and write a delta report."""
     from qrsimbench.reporting.compare import render_compare

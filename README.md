@@ -48,6 +48,14 @@ qrsimbench sweep examples/warehouse_amr/scenarios/baseline.yaml --reps 5      # 
 qrsimbench stress examples/warehouse_amr/stress/blocked_aisle_stress.yaml     # randomized variants
 ```
 
+## See it
+
+- **Live:** leave out `--headless` and Gazebo opens its 3D window while the robot drives.
+- **Evidence report:** every run writes `report.html` (verdict, gates, metrics, path and clearance plots).
+- **3D replay in the browser:** `qrsimbench replay latest:blocked_aisle` opens an interactive replay of the
+  recorded run (robots, people, spawned obstacles, stations, timeline, speed controls). Several runs can be
+  replayed together: `qrsimbench replay <run> <run> ...`.
+
 | Scenario | Condition | Expected |
 |---|---|---|
 | `baseline` | clear route | PASS |

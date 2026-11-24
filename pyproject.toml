@@ -42,7 +42,7 @@ select = ["E", "F", "I", "B", "UP"]
 testpaths = ["tests"]
 
 [tool.setuptools.package-data]
-qrsimbench = ["reporting/templates/*", "console/static/*"]
+qrsimbench = ["reporting/templates/*", "reporting/viewer/*", "reporting/viewer/static/*", "reporting/viewer/static/vendor/three/*", "console/static/*"]
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/*.py" = ["E501"]

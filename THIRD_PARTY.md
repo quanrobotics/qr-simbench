@@ -14,6 +14,7 @@ RoboStack / conda-forge into `./env`):
 | Typer, Pydantic, PyYAML, NumPy, Matplotlib, Jinja2, Pillow | dependencies | MIT / BSD / PSF / HPND |
 | PyArrow | Parquet episode tables, LeRobot-style export | Apache-2.0 |
 | FastAPI, Uvicorn | dependencies | MIT / BSD-3-Clause |
+| three.js r170 (`three.module.js`, `OrbitControls.js`) | 3D replay viewer, bundled in `src/qrsimbench/reporting/viewer/static/vendor/three/` | MIT |
 
 Files in this repository derived from upstream:
 
