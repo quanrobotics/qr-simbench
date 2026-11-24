@@ -1,0 +1,31 @@
+# Single source of truth for the reference warehouse. scripts/build_world.py generates the Gazebo
+# world (.sdf.xacro) and the Nav2 occupancy map (.pgm/.yaml) from this file, so they always agree.
+id: qr_warehouse_small
+bounds: {x_min: -6.5, x_max: 6.5, y_min: -4.5, y_max: 4.5}   # inner wall faces
+wall: {thickness: 0.2, height: 1.2, color: [0.75, 0.75, 0.78]}
+map_resolution: 0.05
+racks:           # center x, y, size x, y, height (static, collidable)
+  # R1 and R4 stand against the north/south walls. Aisle 1 (1.8 m) between R1 and R2; aisle 2 (1.6 m)
+  # between R2 and R3; narrow storage aisle (1.0 m) between R3 and R4. R2 is split at x=0 to form
+  # the cross-aisle intersection. Open areas west (receiving) and east (dispatch).
+  - {name: rack_r1,      x: 0.0,  y: 3.75,  sx: 7.0, sy: 1.5, h: 1.8, uprights: {at: [0.02, 0.17, 0.41, 0.55, 0.78, 0.98]}}
+  - {name: rack_r2_west, x: -2.3, y: 0.8,   sx: 3.0, sy: 0.8, h: 1.8, uprights: {at: [0.03, 0.38, 0.97]}}
+  - {name: rack_r2_east, x: 2.3,  y: 0.8,   sx: 3.0, sy: 0.8, h: 1.8, uprights: {at: [0.03, 0.66, 0.97]}}
+  - {name: rack_r3,      x: 0.0,  y: -1.6,  sx: 7.0, sy: 0.8, h: 1.8, uprights: {at: [0.02, 0.24, 0.37, 0.63, 0.85, 0.98]}}
+  - {name: rack_r4,      x: 0.0,  y: -3.75, sx: 7.0, sy: 1.5, h: 1.8, uprights: {at: [0.02, 0.31, 0.5, 0.72, 0.98]}}
+  - {name: dock_block,   x: 5.6,  y: 3.6,   sx: 1.2, sy: 1.2, h: 1.0}
+clutter:         # fixed pallets/totes along the walls (static); also asymmetric LiDAR landmarks
+  - {name: tote_w1, x: -6.1, y: -1.2, sx: 0.6, sy: 0.6}
+  - {name: tote_w2, x: -6.1, y: 3.6,  sx: 0.6, sy: 1.0}
+  - {name: tote_w3, x: -5.2, y: -4.1, sx: 1.0, sy: 0.6}
+  - {name: tote_e1, x: 6.1,  y: -2.6, sx: 0.6, sy: 1.2}
+  - {name: tote_e2, x: 4.6,  y: -4.1, sx: 0.8, sy: 0.6}
+stations:        # floor markers (visual only) + named poses used by scenarios
+  station_a: {x: -5.0, y: 2.1,  yaw: 0.0, label: Receiving, color: [0.15, 0.45, 0.9]}
+  station_b: {x: 0.0,  y: -2.5, yaw: 0.0, label: Storage,   color: [0.95, 0.65, 0.1]}
+  station_c: {x: 5.0,  y: -0.4, yaw: 0.0, label: Dispatch,  color: [0.1, 0.65, 0.3]}
+  station_d: {x: -5.0, y: -1.6, yaw: 0.0, label: Staging,   color: [0.55, 0.3, 0.8]}
+  station_e: {x: 5.0,  y: 1.9,  yaw: 3.1416, label: Outbound, color: [0.85, 0.25, 0.25]}
+demo_cameras:    # only in the generated *_demo world, used when recording video
+  - {name: overview,  pose: "0 0 14.5 0 1.5707 1.5707", hfov: 1.25}
+  - {name: isometric, pose: "-9.5 -8.5 8.0 0 0.62 0.72", hfov: 1.1}

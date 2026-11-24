@@ -1,0 +1,12 @@
+name: New scenario or world
+description: Propose a scenario, world or importer
+labels: [scenario]
+body:
+  - type: textarea
+    id: what
+    attributes: {label: What it tests, description: "Robot, world, condition injected, expected verdict."}
+    validations: {required: true}
+  - type: textarea
+    id: source
+    attributes: {label: Source and licence of any map or model}
+    validations: {required: true}

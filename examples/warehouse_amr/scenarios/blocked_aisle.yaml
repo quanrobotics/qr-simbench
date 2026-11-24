@@ -1,0 +1,28 @@
+schema_version: "0.1"
+experiment:
+  name: "blocked_aisle"
+  description: "S1: pallet appears ahead once the robot enters the aisle, expected PASS with degraded metrics"
+  seed: 42
+robot:
+  profile: warehouse_amr_v1
+world:
+  id: qr_warehouse_small
+navigation:
+  stack: nav2
+  parameter_profile: nav2_warehouse_v1
+mission:
+  start: station_a
+  goal: station_c
+  timeout_seconds: 180
+metrics: [success, time_to_goal, path_length, path_efficiency, min_clearance, stopped_time, goal_error]
+gates:
+  success: {equals: true}
+  min_clearance: {greater_than_m: 0.20, warn_below_m: 0.30}
+  timeout: {less_than_seconds: 180}
+events:
+  - id: pallet_appears
+    trigger: {type: robot_near, x: -4.3, y: 2.1, radius_m: 0.4}
+    action:
+      type: spawn_entity
+      asset: pallet
+      pose: {x: -2.4, y: 2.1, z: 0.0, yaw: 1.5708}

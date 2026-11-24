@@ -1,0 +1,18 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: {label: What happened, description: "What you ran, what you expected, what you got."}
+    validations: {required: true}
+  - type: textarea
+    id: repro
+    attributes: {label: Steps to reproduce, description: "Scenario file and command, if possible."}
+    validations: {required: true}
+  - type: textarea
+    id: doctor
+    attributes: {label: Output of `qrsimbench doctor`, render: text}
+  - type: textarea
+    id: logs
+    attributes: {label: Relevant logs (run folder `logs/`), render: text}

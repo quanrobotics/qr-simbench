@@ -1,0 +1,16 @@
+{
+  "os": "Ubuntu 22.04.5 LTS",
+  "kernel": "6.8.0-138-generic",
+  "python": "3.12.15",
+  "qrsimbench_version": "0.1.0.dev0",
+  "schema_version": "0.1",
+  "ros_distro": "jazzy",
+  "gazebo_version": "Released under the Apache 2.0 License.",
+  "conda_prefix": "/path/to/qr-simbench/env",
+  "cpu": "Intel(R) Core(TM) Ultra 5 245K",
+  "cpu_count": 14,
+  "gpu": [
+    "NVIDIA GeForce RTX 2080 Ti, 580.178.04, 11264 MiB"
+  ],
+  "hostname": "qr-workstation"
+}

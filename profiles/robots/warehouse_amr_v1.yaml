@@ -1,0 +1,14 @@
+# Reference warehouse AMR. Bootstrap: Nav2 quickstart TurtleBot3 Waffle (upstream, not our hardware).
+id: warehouse_amr_v1
+robot_type: diff_drive_amr   # adapters/base.py RobotType
+upstream_model: turtlebot3_waffle
+drive: differential
+footprint_radius_m: 0.22
+max_linear_speed_mps: 0.5   # Nav2 Jazzy default controller limit; the sim robot reaches it
+max_angular_speed_rps: 1.82
+lidar:
+  topic: /scan
+  range_min_m: 0.12
+  range_max_m: 3.5
+sim_robot_sdf: simulation/robots/gz_waffle_gt.sdf.xacro   # upstream SDF + PosePublisher (scripts/build_robot.py)
+gz_model_name: turtlebot3_waffle

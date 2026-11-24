@@ -1,0 +1,20 @@
+[
+  {
+    "id": "_nav2_active",
+    "type": "lifecycle",
+    "t": 1791798511.7088928,
+    "detail": "ready after 9.4s, localized=True"
+  },
+  {
+    "id": "pallet_appears",
+    "type": "spawn_entity",
+    "t": 1791798513.7506378,
+    "elapsed": 1.3031795024871826,
+    "robot_xy": [
+      -4.6550529216228975,
+      2.098979463556473
+    ],
+    "ok": true,
+    "detail": "ut still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791798513.114649591] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n[INFO] [1791798513.324628046] [ros_gz_sim]: Entity creation successful."
+  }
+]

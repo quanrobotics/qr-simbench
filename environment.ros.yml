@@ -1,0 +1,32 @@
+# In-folder ROS 2 Jazzy + Gazebo Harmonic + Nav2 env (RoboStack, no sudo).
+# Create: mamba env create -p ./env -f environment.ros.yml
+channels: [robostack-jazzy, conda-forge]
+dependencies:
+  - python=3.12
+  - ros-jazzy-desktop
+  - ros-jazzy-navigation2
+  - ros-jazzy-nav2-bringup
+  - ros-jazzy-nav2-minimal-tb3-sim
+  - ros-jazzy-nav2-simple-commander
+  - ros-jazzy-ros-gz
+  - ros-jazzy-rosbag2-storage-mcap
+  - compilers
+  - cmake
+  - pkg-config
+  - make
+  - colcon-common-extensions
+  - typer
+  - pydantic>=2.6
+  - pyyaml
+  - numpy
+  - matplotlib
+  - jinja2
+  - pytest
+  - ruff
+  - pip
+  - pip:
+      - mcap>=1.1
+      - mcap-ros2-support>=0.5
+      - pyarrow>=15
+      - fastapi>=0.110
+      - uvicorn>=0.29

@@ -1,0 +1,4 @@
+# Upstream Nav2 Jazzy default parameters (nav2_bringup/params/nav2_params.yaml), unmodified.
+id: nav2_default_v1
+source: nav2_bringup/params/nav2_params.yaml
+overrides: {}

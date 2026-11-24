@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Run comparison · QR-SimBench</title><style>{{ css }}</style></head>
+<body><div class="wrap">
+<header class="brand"><div><b>QR-SimBench</b> <span>Scenario-to-Evidence Validation for Physical AI</span></div>
+<span>Comparison · generated {{ generated }}</span></header>
+
+<div class="hero"><div><h1>{{ A.manifest.scenario_name.replace("_"," ") }} vs {{ B.manifest.scenario_name.replace("_"," ") }}</h1>
+<div class="sub">{% if same_config %}Same resolved configuration: differences are run-to-run variation.{% else %}Different configurations: differences reflect the scenario change.{% endif %}</div></div></div>
+
+<div class="grid2">
+{% for label, X in [("A", A), ("B", B)] %}
+<section><h2>Run {{ label }}</h2>
+<div class="verdict {{ X.metrics.verdict }}" style="font-size:18px"><small>Engineering Validation Verdict</small>{{ X.metrics.verdict }}</div>
+<table style="margin-top:10px">
+<tr><td>Scenario</td><td><b>{{ X.manifest.scenario_name }}</b></td></tr>
+<tr><td>Run</td><td><code>{{ X.manifest.run_id }}</code></td></tr>
+<tr><td>Seed · Git</td><td><code>{{ X.manifest.seed }} · {{ (X.manifest.git_commit or "n/a")[:7] }}</code></td></tr>
+<tr><td>Codes</td><td>{% for c in X.metrics.codes %}<span class="tag">{{ c }}</span>{% endfor %}</td></tr>
+</table></section>
+{% endfor %}
+</div>
+
+<section><h2>Metric deltas (B vs A)</h2>
+<table><tr><th>Metric</th><th style="text-align:right">A · {{ A.manifest.scenario_name }}</th><th style="text-align:right">B · {{ B.manifest.scenario_name }}</th><th style="text-align:right">Change</th></tr>
+{% for r in rows %}<tr><td>{{ r.label }}</td><td class="num">{{ r.a }}</td><td class="num">{{ r.b }}</td><td class="num {{ r.cls }}">{{ r.delta }}</td></tr>{% endfor %}
+</table></section>
+
+<section><h2>Trajectories</h2>{{ overlay | safe }}</section>
+
+<footer>Engineering validation comparison of simulated runs. Not a safety certification and not a claim of real-world equivalence.
+Upstream: Gazebo Harmonic, Nav2, ROS 2 Jazzy, rosbag2, MCAP.</footer>
+</div></body></html>

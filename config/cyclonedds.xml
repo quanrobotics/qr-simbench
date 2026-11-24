@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- QR fleet runs: one simulation has ~6 DDS participants per robot. Cyclone's default automatic
+     participant-index limit is too small for 10 robots on localhost ("Failed to find a free
+     participant index"); raise it. Nothing else changes. -->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain id="any">
+    <Discovery>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <MaxAutoParticipantIndex>250</MaxAutoParticipantIndex>
+    </Discovery>
+  </Domain>
+</CycloneDDS>

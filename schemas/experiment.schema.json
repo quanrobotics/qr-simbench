@@ -1,0 +1,414 @@
+{
+  "$defs": {
+    "DeleteEntityAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "delete_entity",
+          "title": "Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "DeleteEntityAction",
+      "type": "object"
+    },
+    "ElapsedTimeTrigger": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "elapsed_time",
+          "title": "Type",
+          "type": "string"
+        },
+        "seconds": {
+          "minimum": 0,
+          "title": "Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "seconds"
+      ],
+      "title": "ElapsedTimeTrigger",
+      "type": "object"
+    },
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "trigger": {
+          "$ref": "#/$defs/ElapsedTimeTrigger"
+        },
+        "action": {
+          "discriminator": {
+            "mapping": {
+              "delete_entity": "#/$defs/DeleteEntityAction",
+              "spawn_entity": "#/$defs/SpawnEntityAction"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SpawnEntityAction"
+            },
+            {
+              "$ref": "#/$defs/DeleteEntityAction"
+            }
+          ],
+          "title": "Action"
+        }
+      },
+      "required": [
+        "id",
+        "trigger",
+        "action"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "Experiment": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "pattern": "^[a-z0-9_]+$",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "seed": {
+          "default": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Experiment",
+      "type": "object"
+    },
+    "Mission": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/Pose"
+            }
+          ],
+          "title": "Start"
+        },
+        "goal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/Pose"
+            }
+          ],
+          "title": "Goal"
+        },
+        "timeout_seconds": {
+          "default": 180,
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "start",
+        "goal"
+      ],
+      "title": "Mission",
+      "type": "object"
+    },
+    "Navigation": {
+      "additionalProperties": false,
+      "properties": {
+        "stack": {
+          "const": "nav2",
+          "default": "nav2",
+          "title": "Stack",
+          "type": "string"
+        },
+        "parameter_profile": {
+          "default": "nav2_default_v1",
+          "title": "Parameter Profile",
+          "type": "string"
+        }
+      },
+      "title": "Navigation",
+      "type": "object"
+    },
+    "Pose": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "default": 0.0,
+          "title": "Z",
+          "type": "number"
+        },
+        "yaw": {
+          "default": 0.0,
+          "title": "Yaw",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "Pose",
+      "type": "object"
+    },
+    "Recording": {
+      "additionalProperties": false,
+      "properties": {
+        "storage": {
+          "const": "mcap",
+          "default": "mcap",
+          "title": "Storage",
+          "type": "string"
+        },
+        "topics": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Topics",
+          "type": "array"
+        }
+      },
+      "title": "Recording",
+      "type": "object"
+    },
+    "Robot": {
+      "additionalProperties": false,
+      "properties": {
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile"
+      ],
+      "title": "Robot",
+      "type": "object"
+    },
+    "Runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "ros_distro": {
+          "const": "jazzy",
+          "default": "jazzy",
+          "title": "Ros Distro",
+          "type": "string"
+        },
+        "simulator": {
+          "const": "gazebo_harmonic",
+          "default": "gazebo_harmonic",
+          "title": "Simulator",
+          "type": "string"
+        },
+        "headless": {
+          "default": false,
+          "title": "Headless",
+          "type": "boolean"
+        }
+      },
+      "title": "Runtime",
+      "type": "object"
+    },
+    "SpawnEntityAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "spawn_entity",
+          "title": "Type",
+          "type": "string"
+        },
+        "asset": {
+          "title": "Asset",
+          "type": "string"
+        },
+        "pose": {
+          "$ref": "#/$defs/Pose"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "pose"
+      ],
+      "title": "SpawnEntityAction",
+      "type": "object"
+    },
+    "Threshold": {
+      "additionalProperties": false,
+      "properties": {
+        "equals": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Equals"
+        },
+        "greater_than_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Greater Than M"
+        },
+        "warn_below_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Warn Below M"
+        },
+        "less_than_seconds": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Less Than Seconds"
+        }
+      },
+      "title": "Threshold",
+      "type": "object"
+    },
+    "World": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "World",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "experiment": {
+      "$ref": "#/$defs/Experiment"
+    },
+    "runtime": {
+      "$ref": "#/$defs/Runtime"
+    },
+    "robot": {
+      "$ref": "#/$defs/Robot"
+    },
+    "world": {
+      "$ref": "#/$defs/World"
+    },
+    "navigation": {
+      "$ref": "#/$defs/Navigation"
+    },
+    "mission": {
+      "$ref": "#/$defs/Mission"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/Event"
+      },
+      "title": "Events",
+      "type": "array"
+    },
+    "recording": {
+      "$ref": "#/$defs/Recording"
+    },
+    "metrics": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Metrics",
+      "type": "array"
+    },
+    "gates": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Threshold"
+      },
+      "title": "Gates",
+      "type": "object"
+    }
+  },
+  "required": [
+    "experiment",
+    "robot",
+    "world",
+    "mission"
+  ],
+  "title": "Scenario",
+  "type": "object"
+}

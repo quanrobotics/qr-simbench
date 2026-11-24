@@ -1,0 +1,31 @@
+schema_version: "0.1"
+experiment:
+  name: "fleet_shift"
+  description: "F1: three AMRs run transport task chains through shared aisles; a pallet blocks aisle 1 mid-shift"
+  seed: 42
+robot:
+  profile: warehouse_amr_v1
+world:
+  id: qr_warehouse_small
+navigation:
+  stack: nav2
+  parameter_profile: nav2_warehouse_v2
+mission:
+  timeout_seconds: 240
+fleet:
+  - {id: amr_1, start: station_a, goals: [station_c, station_a]}
+  - {id: amr_2, start: station_d, goals: [station_e, station_b]}
+  - {id: amr_3, start: {x: -6.0, y: 0.3, yaw: 0.0}, goals: [station_b, station_e]}
+events:
+  - id: pallet_appears
+    trigger: {type: robot_near, robot: amr_1, x: -4.3, y: 2.1, radius_m: 0.4}
+    action:
+      type: spawn_entity
+      asset: pallet
+      pose: {x: -2.4, y: 2.1, z: 0.0, yaw: 1.5708}
+metrics: [success, time_to_goal, path_length, path_efficiency, min_clearance, stopped_time, goal_error]
+gates:
+  success: {equals: true}
+  min_clearance: {greater_than_m: 0.20, warn_below_m: 0.30}
+  timeout: {less_than_seconds: 240}
+  robot_separation: {greater_than_m: 0.45, warn_below_m: 0.8}

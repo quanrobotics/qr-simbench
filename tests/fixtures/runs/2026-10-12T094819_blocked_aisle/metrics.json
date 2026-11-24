@@ -1,0 +1,45 @@
+{
+  "verdict": "PASS",
+  "verdict_label": "Engineering Validation Verdict",
+  "codes": [
+    "MISSION_SUCCESS"
+  ],
+  "gates": [
+    {
+      "gate": "success",
+      "passed": true,
+      "detail": "success == True",
+      "severity": "FAIL"
+    },
+    {
+      "gate": "min_clearance",
+      "passed": true,
+      "detail": "min clearance 0.63 m",
+      "severity": "FAIL"
+    },
+    {
+      "gate": "timeout",
+      "passed": true,
+      "detail": "time to goal 35.8 s",
+      "severity": "FAIL"
+    }
+  ],
+  "metrics": {
+    "success": true,
+    "nav2_result": "SUCCEEDED",
+    "time_to_goal": 35.79381799697876,
+    "path_length": 13.324918138334048,
+    "straight_line_distance": 10.307764064044152,
+    "path_efficiency": 0.7735705358211591,
+    "goal_error": 0.1989009354647686,
+    "mean_speed": 0.37543220181891684,
+    "max_speed": 0.4600000000002306,
+    "stopped_time": 0.0,
+    "stop_episodes": 0,
+    "min_clearance": 0.6298660039901733,
+    "clearance_p5": 0.664025068283081,
+    "time_below_threshold": 0.0,
+    "localization_error_mean": 0.03032819807831422,
+    "localization_error_max": 0.05961660072876178
+  }
+}

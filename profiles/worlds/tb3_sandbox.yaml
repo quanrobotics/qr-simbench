@@ -1,0 +1,12 @@
+# Nav2 Jazzy quickstart sandbox (upstream world, used for the first bring-up).
+
+id: tb3_sandbox
+upstream_world: nav2_bringup/worlds/tb3_sandbox.sdf.xacro
+gz_world: default
+map: simulation/maps/tb3_sandbox.yaml   # copy of upstream nav2_bringup map (Apache-2.0)
+stations:
+  station_a: {x: -2.0, y: 0.55, yaw: 0.0}   # Receiving, aligned with the y=0.55 aisle (avoids an MPPI stall seen when turning out of the quickstart spawn pose)
+  station_b: {x: 0.5, y: -1.8, yaw: 0.0}    # Storage
+  station_c: {x: 1.8, y: 0.5, yaw: 0.0}     # Dispatch
+obstacle_points:
+  aisle_center: {x: 0.0, y: 0.55}   # between pillar rows y=0 and y=1.1

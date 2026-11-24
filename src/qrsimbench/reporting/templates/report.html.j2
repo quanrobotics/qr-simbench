@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ title }} · QR-SimBench</title><style>{{ css }}</style></head>
+<body><div class="wrap">
+<header class="brand"><div><b>QR-SimBench</b> <span>Scenario-to-Evidence Validation for Physical AI</span></div>
+<span>Evidence report · generated {{ generated }}</span></header>
+
+<div class="hero">
+  <div>
+    <h1>{{ title }}</h1>
+    <div class="sub">{{ description }}</div>
+    <div class="meta">Run {{ manifest.run_id }}<br>Seed {{ manifest.seed }} · Git {{ (manifest.git_commit or "n/a")[:7] }}{% if manifest.git_dirty %} (dirty){% endif %}</div>
+  </div>
+  <div class="verdict {{ verdict }}"><small>Engineering Validation Verdict</small>{{ verdict }}</div>
+</div>
+
+<div class="cards">
+{% for c in cards %}<div class="card"><div class="k">{{ c.label }}</div><div class="v">{{ c.value }} <span class="u">{{ c.unit }}</span></div></div>
+{% endfor %}</div>
+
+<section><h2>Top-down trajectory</h2>{{ plots.trajectory | safe }}</section>
+<div class="grid2">
+<section><h2>Velocity timeline</h2>{{ plots.velocity | safe }}</section>
+<section><h2>LiDAR clearance proxy</h2>{{ plots.clearance | safe }}</section>
+</div>
+
+<div class="grid2">
+<section><h2>Event timeline</h2>
+<table><tr><th>t [s]</th><th>Event</th><th>Status</th></tr>
+<tr><td class="num">0.0</td><td>Mission sent: {{ mission.start }} → {{ mission.goal }}</td><td></td></tr>
+{% for e in events %}<tr><td class="num">{{ "%.1f"|format(e.t_rel) }}</td><td>{{ e.id }} <span class="u">({{ e.type }})</span></td>
+<td>{% if e.ok %}<span class="ok">applied</span>{% else %}<span class="bad">failed</span>{% endif %}</td></tr>{% endfor %}
+<tr><td class="num">{{ end_t }}</td><td>Mission ended: {{ manifest.terminal_result }}</td><td></td></tr>
+</table></section>
+<section><h2>Gates &amp; outcome codes</h2>
+<div>{% for c in codes %}<span class="tag">{{ c }}</span>{% endfor %}</div>
+<table><tr><th>Gate</th><th>Result</th><th>Detail</th></tr>
+{% for g in gates %}<tr><td>{{ g.gate }}</td><td>{% if g.passed %}<span class="ok">pass</span>{% elif g.severity == "WARN" %}<span class="soft">warn</span>{% else %}<span class="bad">fail</span>{% endif %}</td><td>{{ g.detail }}</td></tr>{% endfor %}
+</table></section>
+</div>
+
+{% if robots %}<section><h2>Per-robot evidence</h2><table>
+<tr><th>Robot</th><th>Verdict</th><th style="text-align:right">Tasks</th><th style="text-align:right">Time [s]</th><th style="text-align:right">Path [m]</th><th style="text-align:right">Efficiency</th><th style="text-align:right">Min clearance [m]</th><th style="text-align:right">Goal error [m]</th><th style="text-align:right">Stopped [s]</th><th style="text-align:right">Loc. error max [m]</th></tr>
+{% for r in robots %}<tr><td><b>{{ r.id }}</b></td><td><span class="verdict {{ r.verdict }}" style="font-size:12px;padding:1px 8px">{{ r.verdict }}</span></td><td class="num">{{ r.tasks_completed }}</td><td class="num">{{ r.time_to_goal }}</td><td class="num">{{ r.path_length }}</td><td class="num">{{ r.path_efficiency }}</td><td class="num">{{ r.min_clearance }}</td><td class="num">{{ r.goal_error }}</td><td class="num">{{ r.stopped_time }}</td><td class="num">{{ r.localization_error_max }}</td></tr>{% endfor %}
+</table></section>{% endif %}
+
+<section><h2>All metrics</h2><table><tr><th>Metric</th><th style="text-align:right">Value</th></tr>
+{% for k, v in metrics.items() %}<tr><td>{{ k }}</td><td class="num">{{ v }}</td></tr>{% endfor %}</table></section>
+
+<section><h2>Reproduce</h2><pre>{{ reproduce }}</pre></section>
+
+<div class="grid2">
+<section><h2>Software environment</h2><table>
+{% for k, v in env.items() %}<tr><td>{{ k }}</td><td><code>{{ v }}</code></td></tr>{% endfor %}</table></section>
+<section><h2>Provenance &amp; artifacts</h2><table>
+{% for k, v in provenance.items() %}<tr><td>{{ k }}</td><td><code>{{ v }}</code></td></tr>{% endfor %}</table></section>
+</div>
+
+<section><h2>Scenario configuration (resolved)</h2>
+<details><summary>Show scenario.resolved.yaml</summary><pre>{{ scenario_yaml }}</pre></details></section>
+
+<footer>
+The verdict is an engineering validation result for this simulated scenario. It is not a safety certification and does not by itself predict real-world performance.
+Simulation: Gazebo Harmonic. Navigation (system under test): Nav2. Middleware and recording: ROS 2 Jazzy, rosbag2, MCAP. These are upstream open-source projects. QR-SimBench provides the scenario contract, orchestration, metrics, provenance and this report.
+</footer>
+</div></body></html>

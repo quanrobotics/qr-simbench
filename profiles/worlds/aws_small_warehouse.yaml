@@ -1,0 +1,6 @@
+# Imported showcase layout: AWS RoboMaker small warehouse (MIT-0), see scripts/importers/aws_small_warehouse.py.
+id: aws_small_warehouse
+layout: simulation/worlds/aws_small_warehouse.layout.yaml
+sim_world: simulation/worlds/aws_small_warehouse.sdf.xacro
+map: simulation/maps/aws_small_warehouse.yaml
+gz_world: default

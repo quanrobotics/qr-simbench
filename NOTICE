@@ -1,0 +1,10 @@
+QR-SimBench
+Copyright 2026 QR (https://www.quanrobotics.org)
+
+This product includes software developed by QR, licensed under the Apache License, Version 2.0.
+
+Parts of simulation/ are derived from Nav2 (nav2_bringup, nav2_minimal_tb3_sim) and Gazebo (gz-sim),
+licensed under the Apache License, Version 2.0. See THIRD_PARTY.md.
+
+QR's fleet coordination technology is patent pending and is not included in, or licensed by, this
+repository.

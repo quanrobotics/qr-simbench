@@ -1,0 +1,42 @@
+{
+  "run_id": "2026-10-12T094819_blocked_aisle",
+  "started_at": "2026-10-12T09:48:19.114308+00:00",
+  "finished_at": "2026-10-12T09:49:23.603540+00:00",
+  "scenario_name": "blocked_aisle",
+  "scenario_source": "/path/to/qr-simbench/examples/warehouse_amr/scenarios/blocked_aisle.yaml",
+  "scenario_sha256": "bd6a13d7a846fb3f9527227bb5308bcac19e5064f418e7f12ea288d8108b8fbc",
+  "resolved_sha256": "03e459374502cf524461c61a16ba56bfffd44bf1ecf4df119b7e56de653ceb1b",
+  "seed": 42,
+  "git_commit": "f0b7c6ba31cc1d930b475658d4631430278f3cab",
+  "git_dirty": true,
+  "ros_distro": "jazzy",
+  "gazebo_version": "Released under the Apache 2.0 License.",
+  "nav2_profile_sha256": "a6cb116c828e66f77279d3a59eba0b43669d68c49268f8f1773d31b0cc842963",
+  "robot_profile_sha256": "8cc1af843698c97eb43082d40be49d5fbb33852def4c65105ef112a3d6e200ca",
+  "world_profile_sha256": "2b81188701044f17273af499c03e2504cb0c3192210679f7690715771380f499",
+  "recorded_topics": [
+    "/tf",
+    "/tf_static",
+    "/odom",
+    "/scan",
+    "/cmd_vel",
+    "/plan",
+    "/amcl_pose"
+  ],
+  "command": [
+    "qrsimbench",
+    "run",
+    "examples/warehouse_amr/scenarios/blocked_aisle.yaml",
+    "--headless"
+  ],
+  "terminal_result": "SUCCEEDED",
+  "artifacts": {
+    "scenario": "scenario.resolved.yaml",
+    "environment": "environment.json",
+    "bag": "run.mcap",
+    "events": "events.json",
+    "metrics": "metrics.json",
+    "report": "report.html"
+  },
+  "verdict": "PASS"
+}

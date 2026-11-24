@@ -1,0 +1,9 @@
+# Reference warehouse world. Geometry and stations come from the layout file; the Gazebo world and
+# the Nav2 map are generated from it by scripts/build_world.py.
+id: qr_warehouse_small
+layout: simulation/worlds/qr_warehouse_small.layout.yaml
+sim_world: simulation/worlds/qr_warehouse_small.sdf.xacro
+map: simulation/maps/qr_warehouse_small.yaml
+gz_world: default
+gui_configs: [simulation/gui/demo_overview.gui.config, simulation/gui/demo_follow.gui.config]   # GUI runs: headless server + these clients
+gui_follow: {offset: [-1.2, -0.9, 4.2]}   # chase-camera offset from the robot (m), world frame

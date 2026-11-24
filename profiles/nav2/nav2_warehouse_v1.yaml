@@ -1,0 +1,16 @@
+# Upstream Nav2 Jazzy defaults plus AMCL tuning for the warehouse world. Simulated odometry is
+# near-perfect, and long parallel aisles need the scan to carry more weight.
+id: nav2_warehouse_v1
+source: nav2_bringup/params/nav2_params.yaml
+overrides:
+  amcl:
+    ros__parameters:
+      alpha1: 0.05
+      alpha2: 0.05
+      alpha3: 0.05
+      alpha4: 0.05
+      max_beams: 180
+      update_min_d: 0.1
+      update_min_a: 0.1
+      z_hit: 0.9
+      z_rand: 0.1

@@ -1,0 +1,42 @@
+{
+  "run_id": "2026-10-12T094735_baseline",
+  "started_at": "2026-10-12T09:47:35.425177+00:00",
+  "finished_at": "2026-10-12T09:48:18.242290+00:00",
+  "scenario_name": "baseline",
+  "scenario_source": "/path/to/qr-simbench/examples/warehouse_amr/scenarios/baseline.yaml",
+  "scenario_sha256": "eb8754a23186aa1e4aa87943ce059ed3020ca3e5dc0cb85baf2e7cacbdc3fff5",
+  "resolved_sha256": "e87667a0920a15775806901c24ef6d172714800fce52957560cec223b6233b8b",
+  "seed": 42,
+  "git_commit": "f0b7c6ba31cc1d930b475658d4631430278f3cab",
+  "git_dirty": true,
+  "ros_distro": "jazzy",
+  "gazebo_version": "Released under the Apache 2.0 License.",
+  "nav2_profile_sha256": "a6cb116c828e66f77279d3a59eba0b43669d68c49268f8f1773d31b0cc842963",
+  "robot_profile_sha256": "8cc1af843698c97eb43082d40be49d5fbb33852def4c65105ef112a3d6e200ca",
+  "world_profile_sha256": "2b81188701044f17273af499c03e2504cb0c3192210679f7690715771380f499",
+  "recorded_topics": [
+    "/tf",
+    "/tf_static",
+    "/odom",
+    "/scan",
+    "/cmd_vel",
+    "/plan",
+    "/amcl_pose"
+  ],
+  "command": [
+    "qrsimbench",
+    "run",
+    "examples/warehouse_amr/scenarios/baseline.yaml",
+    "--headless"
+  ],
+  "terminal_result": "SUCCEEDED",
+  "artifacts": {
+    "scenario": "scenario.resolved.yaml",
+    "environment": "environment.json",
+    "bag": "run.mcap",
+    "events": "events.json",
+    "metrics": "metrics.json",
+    "report": "report.html"
+  },
+  "verdict": "PASS"
+}
