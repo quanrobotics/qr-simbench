@@ -116,5 +116,5 @@ See [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" button).
 ## Licence
 
 Apache-2.0 ([LICENSE](LICENSE), [NOTICE](NOTICE)). The QR name and logo are not covered by the licence
-([TRADEMARKS.md](TRADEMARKS.md)). QR's fleet coordination technology is patent pending and is not
-included in this repository.
+([TRADEMARKS.md](TRADEMARKS.md)). QR's fleet coordination technology is patent pending (Indian Patent Application
+No. 202611133474) and is not included in this repository.
