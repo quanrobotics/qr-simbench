@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head><script>window.QR_STATIC = true;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR-SimBench Replay</title><link rel="icon" type="image/png" href="static/brand_icon.png">
+<style>
+  :root { --bg:#0d1014; --panel:rgba(16,20,26,.82); --line:rgba(255,255,255,.10); --text:#e8edf3; --muted:#97a3b3;
+          --accent:#2dd4bf; --warn:#f59e0b; --bad:#ef4444; --ok:#22c55e; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+              font:13px/1.35 Inter, "Segoe UI", system-ui, -apple-system, sans-serif; overflow:hidden; }
+  #view { position:fixed; inset:0; }
+  .panel { position:fixed; background:var(--panel); border:1px solid var(--line); border-radius:10px;
+           backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  #brand { top:14px; left:14px; padding:8px 12px; display:flex; gap:10px; align-items:center; }
+  #brand img { height:28px; }
+  #brand b { font-size:14px; letter-spacing:.2px; }
+  #brand span { color:var(--muted); }
+  #kpis { top:62px; left:14px; display:flex; gap:8px; background:none; border:none; backdrop-filter:none; }
+  .kpi { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 12px; min-width:118px;
+         backdrop-filter:blur(8px); }
+  .kpi small { display:block; color:var(--muted); font-size:11px; }
+  .kpi b { font-size:20px; font-weight:650; font-variant-numeric:tabular-nums; }
+  .kpi i { font-style:normal; color:var(--muted); font-size:11px; margin-left:3px; }
+  #pick { top:14px; right:14px; padding:8px 10px; display:flex; gap:8px; align-items:center; }
+  select, button { background:#1b222c; color:var(--text); border:1px solid var(--line); border-radius:7px;
+                   padding:6px 9px; font:inherit; cursor:pointer; }
+  button.on { background:var(--accent); color:#04201c; border-color:var(--accent); font-weight:600; }
+  #controls { bottom:14px; left:14px; right:330px; padding:8px 10px; display:flex; gap:8px; align-items:center; }
+  #scrub { flex:1; accent-color:var(--accent); }
+  #clock { font-variant-numeric:tabular-nums; color:var(--muted); min-width:92px; text-align:right; }
+  #card { bottom:14px; right:14px; width:300px; padding:12px 14px; }
+  #card h3 { margin:0 0 2px; font-size:14px; }
+  #card .st { font-size:12px; margin-bottom:8px; }
+  #card table { width:100%; border-collapse:collapse; font-size:12px; }
+  #card td { padding:2px 0; } #card td:last-child { text-align:right; font-variant-numeric:tabular-nums; }
+  #card td:first-child { color:var(--muted); }
+  #toast { top:62px; right:14px; padding:8px 12px; max-width:340px; display:none; }
+  #legend { top:120px; left:14px; padding:8px 10px; font-size:11px; color:var(--muted); }
+  #legend span { display:inline-block; width:9px; height:9px; border-radius:50%; margin:0 4px 0 8px; vertical-align:-1px; }
+  body.export #controls, body.export #pick { display:none; }
+  /* embedded in Studio (embed=1): the page around it has the controls; big captions for a projector */
+  body.embed #pick, body.embed #card, body.embed #controls, body.embed #legend { display:none; }
+  body.embed #brand { display:none; } body.embed #kpis { top:52px; left:10px; flex-wrap:nowrap; }
+  body.embed .kpi { min-width:0; flex:0 1 auto; padding:5px 10px; } body.embed .kpi b { font-size:20px; }
+  body.embed .kpi small { font-size:11px; } body.embed #kp_close { display:none; }
+  body.embed.narrow .kpi b { font-size:16px; } body.embed.narrow .kpi small { font-size:10px; }
+  body.embed.narrow #legend2 { font-size:10.5px; padding:5px 8px; line-height:1.5; } body.embed.narrow #caption { font-size:14px; bottom:10px; }
+  body.embed.narrow #kpis { top:46px; }
+  #caption { left:50%; transform:translateX(-50%); bottom:14px; padding:9px 16px; font-size:17px; font-weight:600;
+             max-width:calc(100% - 28px); text-align:center; display:none; }
+  body.embed #caption { display:block; }
+  #legend2 { right:10px; top:10px; padding:7px 10px; font-size:12px; color:var(--text); display:none; line-height:1.7; }
+  body.embed #legend2 { display:block; } body.nolegend #legend2 { display:none; }
+  body.clean .panel { display:none !important; }
+  #legend2 span { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:-1px; }
+  #legend2 .ring { background:none; border:2px solid; width:12px; height:12px; }
+  body.big .kpi b { font-size:28px; } body.big .kpi small { font-size:13px; } body.big #caption { font-size:22px; }
+  body.big #legend2 { font-size:14px; } body.big #brand b { font-size:19px; }
+  @media (max-width: 560px) { body.embed .kpi { min-width:0; } body.embed #legend2 { display:none; } #caption { font-size:14px; } }
+  body.export #brand { top:92px; } body.export #kpis { top:140px; } body.export #legend { top:198px; }
+  body.export #card { bottom:84px; } body.export #toast { top:92px; }
+  @media (max-width: 760px) { body.embed #kpis { flex-wrap:nowrap; } body.embed .kpi { flex:0 1 auto; }
+    #kpis { flex-wrap:wrap; right:14px; } .kpi { min-width:0; flex:1 1 40%; }
+    #controls { right:14px; bottom:150px; } #card { left:14px; width:auto; } #legend { display:none; }
+  }
+</style>
+<script type="importmap">{ "imports": { "three": "./static/vendor/three/three.module.js" } }</script>
+</head>
+<body>
+<div id="view"></div>
+<div id="brand" class="panel"><img src="static/brand_logo.png" alt="Company logo"><b>QR-SimBench</b><span id="stack">Replay</span></div>
+<div id="kpis" class="panel">
+  <div class="kpi"><small>Tasks done</small><b id="k_tasks">0</b><i id="k_total"></i></div>
+  <div class="kpi" id="kp_rate"><small>Tasks per hour</small><b id="k_rate">0</b></div>
+  <div class="kpi" id="kp_calls" style="display:none"><small>Close calls with people</small><b id="k_calls">0</b></div>
+  <div class="kpi" id="kp_close"><small>Closest robot to a person</small><b id="k_close">–</b><i>m</i></div>
+  <div class="kpi"><small>Robot-caused contact</small><b id="k_contact">0.0</b><i>s</i></div>
+</div>
+<div id="legend" class="panel">Robot status<span style="background:var(--ok)"></span>driving<span style="background:var(--warn)"></span>waiting
+  <span style="background:#64748b"></span>done<span style="background:var(--bad)"></span>broken down</div>
+<div id="pick" class="panel"><a id="back" href="/studio" hidden style="color:var(--text);text-decoration:none;border:1px solid var(--line);border-radius:7px;padding:6px 9px;background:#1b222c">&larr; Studio</a><select id="runs"></select><button id="cine" title="Cinematic camera (C)">Cinematic</button></div>
+<div id="toast" class="panel"></div>
+<div id="caption" class="panel"></div>
+<div id="legend2" class="panel"><div><span style="background:#22c55e"></span>Robot driving</div><div><span style="background:#f59e0b"></span>Robot waiting</div>
+<div><span style="background:#ef4444"></span>Robot broken down</div><div><span style="background:#64748b"></span>Robot finished</div>
+<div><span class="ring" style="border-color:#f59e0b"></span>Person within 1 m</div><div><span class="ring" style="border-color:#ef4444"></span>Person within 0.45 m</div>
+<div><span style="background:#f5a524;border-radius:2px"></span>Worker (orange vest)</div><div><span style="background:#e23b2e;border-radius:2px"></span>Forklift</div></div>
+<div id="controls" class="panel">
+  <button id="play">Pause</button>
+  <button data-s="1">1x</button><button data-s="2">2x</button><button data-s="5" class="on">5x</button><button data-s="10">10x</button>
+  <input id="scrub" type="range" min="0" max="1000" value="0">
+  <span id="clock">00:00</span>
+</div>
+<div id="card" class="panel"><h3 id="c_name">Click a robot</h3><div class="st" id="c_state">Simulation replay from logged positions</div>
+  <table><tr><td>Speed</td><td id="c_speed">–</td></tr><tr><td>Tasks done</td><td id="c_tasks">–</td></tr>
+  <tr><td>Nearest person</td><td id="c_near">–</td></tr><tr><td>Distance driven</td><td id="c_dist">–</td></tr></table></div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "./static/vendor/three/OrbitControls.js";
+const S = !!window.QR_STATIC; // static web build: data from data/ files, no backend
+let spawned = []; // objects spawned by scenario events: [t, mesh]
+
+const $ = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const EMBED = !!params.get("embed"), LIVE = !!params.get("live");
+let LOWQ = params.get("q") === "low";
+if (EMBED) document.body.classList.add("embed");
+const narrow = () => document.body.classList.toggle("narrow", innerWidth < 900); narrow(); addEventListener("resize", narrow);
+if (params.get("big")) document.body.classList.add("big");
+if (params.get("nolegend")) document.body.classList.add("nolegend");
+if (params.get("clean")) document.body.classList.add("clean");
+
+// ------------------------------------------------------------------ renderer and scene
+const renderer = new THREE.WebGLRenderer({ antialias: !LOWQ, preserveDrawingBuffer: true });
+if (params.get("w")) renderer.setPixelRatio(1);
+renderer.setPixelRatio(LOWQ ? 1 : Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = !LOWQ;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+$("view").appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1014);
+scene.fog = new THREE.Fog(0x0d1014, 30, 60);
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.47; controls.minDistance = 3; controls.maxDistance = 45;
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); });
+
+// sim (x, y) -> three (x, -y); y up
+const P = (x, y, h = 0) => new THREE.Vector3(x, h, -y);
+
+function canvasTex(w, h, draw, repeat = 1) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat, repeat); return t;
+}
+let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+const M = {
+  floor: new THREE.MeshStandardMaterial({ color: 0xd2d6db, roughness: 0.78, metalness: 0.05,
+    map: canvasTex(512, 512, (g, w, h) => { g.fillStyle = "#8a9099"; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 9000; i++) { const v = 120 + rnd() * 50 | 0; g.fillStyle = `rgba(${v},${v},${v + 4},.25)`;
+        g.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1 + rnd() * 2); }
+      g.strokeStyle = "rgba(0,0,0,.18)"; g.lineWidth = 2; g.strokeRect(0, 0, w, h); }, 9) }),
+  wall: new THREE.MeshStandardMaterial({ color: 0xc9cfd6, roughness: 0.9 }),
+  upright: new THREE.MeshStandardMaterial({ color: 0x1f5fae, roughness: 0.45, metalness: 0.6 }),
+  beam: new THREE.MeshStandardMaterial({ color: 0xe8732a, roughness: 0.5, metalness: 0.5 }),
+  deck: new THREE.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.6, metalness: 0.4 }),
+  box: new THREE.MeshStandardMaterial({ color: 0xc89b63, roughness: 0.85,
+    map: canvasTex(128, 128, (g, w, h) => { g.fillStyle = "#c99c64"; g.fillRect(0, 0, w, h);
+      g.fillStyle = "#b8874f"; g.fillRect(0, h * .45, w, h * .1); g.fillStyle = "rgba(60,40,20,.35)";
+      g.font = "bold 16px sans-serif"; g.fillText("QR", 10, 28); }) }),
+  pallet: new THREE.MeshStandardMaterial({ color: 0x9b7a52, roughness: 0.95 }),
+  machine: new THREE.MeshStandardMaterial({ color: 0xdfe3e8, roughness: 0.35, metalness: 0.3 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2b3038, roughness: 0.5, metalness: 0.4 }),
+  yellow: new THREE.MeshStandardMaterial({ color: 0xf2c230, roughness: 0.6, emissive: 0x2a2000 }),
+  green: new THREE.MeshStandardMaterial({ color: 0x2fae5b, roughness: 0.6 }),
+  vest: new THREE.MeshStandardMaterial({ color: 0xf5a524, roughness: 0.6, emissive: 0x2a1a00 }),
+  skin: new THREE.MeshStandardMaterial({ color: 0xd9a77e, roughness: 0.7 }),
+  helmet: new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.35 }),
+  pants: new THREE.MeshStandardMaterial({ color: 0x2b3a55, roughness: 0.8 }),
+  forklift: new THREE.MeshStandardMaterial({ color: 0xe23b2e, roughness: 0.45, metalness: 0.3 }),
+};
+const box = (sx, sy, sz, mat, cast = true) => { const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
+  m.castShadow = cast; m.receiveShadow = true; return m; };
+
+function lights(b) {
+  scene.add(new THREE.HemisphereLight(0xe8eef6, 0x3a3631, 1.1));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+  sun.position.set(b.x_min - 4, 18, -(b.y_max + 6)); sun.castShadow = true;
+  const s = Math.max(b.x_max - b.x_min, b.y_max - b.y_min) / 2 + 2;
+  Object.assign(sun.shadow.camera, { left: -s, right: s, top: s, bottom: -s, near: 1, far: 60 });
+  sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
+  sun.target.position.set((b.x_min + b.x_max) / 2, 0, -(b.y_min + b.y_max) / 2); scene.add(sun, sun.target);
+  if (LOWQ) { scene.add(new THREE.AmbientLight(0xffffff, 0.6)); return; } // weak GPUs: no point lights
+  for (let x = b.x_min + 3; x < b.x_max; x += 6) for (let y = b.y_min + 3; y < b.y_max; y += 6) {
+    const l = new THREE.PointLight(0xfff3e0, 6, 9, 1.6); l.position.copy(P(x, y, 4.2)); scene.add(l);
+  }
+}
+
+function buildSite(L) {
+  const b = L.bounds, W = b.x_max - b.x_min, H = b.y_max - b.y_min, cx = (b.x_min + b.x_max) / 2, cy = (b.y_min + b.y_max) / 2;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(W + 30, H + 30), M.floor);
+  floor.rotation.x = -Math.PI / 2; floor.position.copy(P(cx, cy, 0)); floor.receiveShadow = true; scene.add(floor);
+  // low perimeter walls so the camera can see in
+  const t = (L.wall && L.wall.thickness) || 0.25, wh = 1.1;
+  for (const [x, y, sx, sy] of [[cx, b.y_max, W + t, t], [cx, b.y_min, W + t, t], [b.x_min, cy, t, H + t], [b.x_max, cy, t, H + t]]) {
+    const w = box(sx, wh, sy, M.wall); w.position.copy(P(x, y, wh / 2)); scene.add(w);
+    const cap = box(sx + 0.02, 0.06, sy + 0.02, M.yellow, false); cap.position.copy(P(x, y, wh + 0.03)); scene.add(cap);
+  }
+  for (const r of L.racks || []) rack(r);
+  for (const k of L.blocks || []) block(k);
+  for (const c of L.clutter || []) { const g = box(c.sx, c.h, c.sy, M.dark); g.position.copy(P(c.x, c.y, c.h / 2)); scene.add(g); }
+  for (const m of L.markings || []) {
+    const col = m.color ? new THREE.Color(...m.color) : new THREE.Color(0xf2c230);
+    const mk = new THREE.Mesh(new THREE.PlaneGeometry(m.sx, Math.max(m.sy, 0.08)),
+      new THREE.MeshStandardMaterial({ color: col, roughness: 0.7, emissive: col, emissiveIntensity: 0.15 }));
+    mk.rotation.x = -Math.PI / 2; mk.position.copy(P(m.x, m.y, 0.006)); mk.receiveShadow = true; scene.add(mk);
+  }
+  for (const [name, s] of Object.entries(L.stations || {})) station(name, s);
+  lights(b);
+  return { cx, cy, W, H };
+}
+
+function rack(r) {
+  const g = new THREE.Group(), levels = Math.max(2, Math.round(r.h / 0.7)), long = r.sx >= r.sy;
+  const len = long ? r.sx : r.sy, dep = long ? r.sy : r.sx;
+  const ats = (r.uprights && r.uprights.at) || [0.02, 0.5, 0.98];
+  for (const a of ats) for (const side of [-1, 1]) {
+    const u = box(0.08, r.h, 0.08, M.upright); u.position.set((a - 0.5) * len, r.h / 2, side * (dep / 2 - 0.04)); g.add(u);
+  }
+  for (let i = 1; i <= levels; i++) {
+    const z = (i / levels) * r.h - 0.05;
+    for (const side of [-1, 1]) { const be = box(len, 0.1, 0.06, M.beam); be.position.set(0, z, side * (dep / 2 - 0.04)); g.add(be); }
+    if (i < levels) { const d = box(len - 0.1, 0.03, dep - 0.1, M.deck); d.position.set(0, z + 0.06, 0); g.add(d); }
+  }
+  // stock: pallets of boxes on every level, a few gaps
+  for (let i = 0; i < levels; i++) {
+    const z = i === 0 ? 0.02 : (i / levels) * r.h + 0.03, room = (r.h / levels) - 0.2;
+    for (let s = -len / 2 + 0.55; s < len / 2 - 0.4; s += 1.05) {
+      if (rnd() < 0.15) continue;
+      const pal = box(0.95, 0.12, dep - 0.2, M.pallet); pal.position.set(s + 0.45, z + 0.06, 0); g.add(pal);
+      const n = 1 + (rnd() * 3 | 0);
+      for (let k = 0; k < n; k++) {
+        const bh = Math.min(room - 0.15, 0.25 + rnd() * 0.25);
+        const bx = box(0.42, bh, (dep - 0.3) / 2, M.box);
+        bx.position.set(s + 0.22 + (k % 2) * 0.46, z + 0.12 + bh / 2, k < 2 ? -(dep - 0.3) / 4 : (dep - 0.3) / 4);
+        bx.rotation.y = (rnd() - 0.5) * 0.06; g.add(bx);
+      }
+    }
+  }
+  g.position.copy(P(r.x, r.y, 0)); if (!long) g.rotation.y = Math.PI / 2; scene.add(g);
+}
+
+function block(k) {
+  const isConv = /conveyor/i.test(k.name), isCol = /column|pillar/i.test(k.name);
+  const b = box(k.sx, k.h, k.sy, isConv ? M.dark : isCol ? M.wall : M.machine); b.position.copy(P(k.x, k.y, k.h / 2)); scene.add(b);
+  if (isCol) { for (let z = 0.1; z < 1.0; z += 0.3) { const band = box(k.sx + 0.02, 0.15, k.sy + 0.02, z % 0.6 < 0.3 ? M.yellow : M.dark, false);
+    band.position.copy(P(k.x, k.y, z)); scene.add(band); } return; }
+  if (isConv) {
+    const long = k.sx >= k.sy, len = long ? k.sx : k.sy;
+    for (let s = -len / 2 + 0.2; s < len / 2; s += 0.25) {
+      const roller = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, (long ? k.sy : k.sx) - 0.05, 12), M.deck);
+      roller.rotation.x = Math.PI / 2; if (!long) roller.rotation.z = Math.PI / 2;
+      roller.position.copy(P(k.x + (long ? s : 0), k.y + (long ? 0 : s), k.h + 0.04)); if (!long) roller.rotation.set(0, 0, Math.PI / 2);
+      scene.add(roller);
+    }
+    for (let s = -len / 2 + 1; s < len / 2 - 0.5; s += 2.2) {
+      const c = box(0.5, 0.35, 0.5, M.box); c.position.copy(P(k.x + (long ? s : 0), k.y + (long ? 0 : s), k.h + 0.25)); scene.add(c);
+    }
+  } else if (/machine|cell|robot/i.test(k.name)) {
+    const top = box(k.sx * 0.9, 0.06, k.sy * 0.9, M.dark); top.position.copy(P(k.x, k.y, k.h + 0.03)); scene.add(top);
+    const beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.25, 16),
+      new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x22c55e, emissiveIntensity: 1.5 }));
+    beacon.position.copy(P(k.x + k.sx * 0.35, k.y + k.sy * 0.35, k.h + 0.18)); scene.add(beacon);
+  }
+}
+
+function label(text, color = "#e8edf3") {
+  const c = document.createElement("canvas"); c.width = 256; c.height = 64; const g = c.getContext("2d");
+  g.fillStyle = "rgba(13,16,20,.78)"; g.beginPath(); g.roundRect(4, 8, 248, 48, 12); g.fill();
+  g.fillStyle = color; g.font = "600 26px Inter, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 128, 33);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+  s.scale.set(1.6, 0.4, 1); s.renderOrder = 10; return s;
+}
+
+function station(name, s) {
+  const col = new THREE.Color(...(s.color || [0.2, 0.8, 0.7]));
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.38, 0.46, 48),
+    new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 0.6, side: THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.position.copy(P(s.x, s.y, 0.01)); scene.add(ring);
+  const l = label(s.label || name.replace("station_", "")); l.position.copy(P(s.x, s.y, 1.9)); l.scale.multiplyScalar(0.8); scene.add(l);
+}
+
+// ------------------------------------------------------------------ agents
+const ROBOT_COLORS = [0x2dd4bf, 0x60a5fa, 0xa78bfa, 0xf472b6, 0xfacc15, 0x34d399, 0xfb923c, 0x38bdf8, 0xc084fc, 0xf87171];
+function makeRobot(i, id) {
+  const g = new THREE.Group(), col = ROBOT_COLORS[i % ROBOT_COLORS.length];
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.16, 40), M.dark); base.position.y = 0.11; base.castShadow = true; g.add(base);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.04, 40),
+    new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.2, emissive: col, emissiveIntensity: 0.35 })); top.position.y = 0.21; top.castShadow = true; g.add(top);
+  const lidar = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.06, 20), M.dark); lidar.position.set(0.08, 0.26, 0); g.add(lidar);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.225, 0.015, 8, 48),
+    new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x22c55e, emissiveIntensity: 2 }));
+  ring.rotation.x = Math.PI / 2; ring.position.y = 0.16; g.add(ring);
+  const fwd = box(0.08, 0.02, 0.12, new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1 }), false);
+  fwd.position.set(0.17, 0.235, 0); g.add(fwd);
+  const foot = new THREE.Mesh(new THREE.CircleGeometry(0.34, 48),
+    new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.28 }));
+  foot.rotation.x = -Math.PI / 2; foot.position.y = 0.012; g.add(foot);
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.32, 8), M.dark); mast.position.set(-0.1, 0.38, 0); g.add(mast);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.035, 16, 12),
+    new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x22c55e, emissiveIntensity: 2.5 }));
+  beacon.position.set(-0.1, 0.56, 0); g.add(beacon);
+  const halo = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.45, 48),
+    new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0, side: THREE.DoubleSide }));
+  halo.rotation.x = -Math.PI / 2; halo.position.y = 0.02; g.add(halo);
+  const tag = label(id.replace("amr_", "Robot "), "#" + col.toString(16).padStart(6, "0")); tag.position.y = EMBED ? 1.15 : 0.9; tag.scale.multiplyScalar(EMBED ? 1.25 : 0.75); g.add(tag);
+  g.userData = { ring, halo, id, beacon }; base.userData.robot = id; top.userData.robot = id;
+  scene.add(g); return g;
+}
+function makeWorker() {
+  const g = new THREE.Group();
+  const legs = box(0.22, 0.8, 0.16, M.pants); legs.position.y = 0.4; g.add(legs);
+  const torso = box(0.36, 0.55, 0.22, M.vest); torso.position.y = 1.08; g.add(torso);
+  const stripe = box(0.37, 0.05, 0.23, new THREE.MeshStandardMaterial({ color: 0xdddddd, emissive: 0x777777 })); stripe.position.y = 1.05; g.add(stripe);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 16), M.skin); head.position.y = 1.47; g.add(head);
+  const hat = new THREE.Mesh(new THREE.SphereGeometry(0.125, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), M.vest); hat.position.y = 1.5; g.add(hat);
+  g.traverse((o) => { o.castShadow = true; }); g.userData.legs = legs; scene.add(g); return g;
+}
+function makeForklift() {
+  const g = new THREE.Group();
+  const body = box(1.1, 0.55, 0.75, M.forklift); body.position.set(-0.1, 0.4, 0); g.add(body);
+  const seat = box(0.35, 0.35, 0.5, M.dark); seat.position.set(-0.3, 0.85, 0); g.add(seat);
+  for (const z of [-0.33, 0.33]) { const post = box(0.05, 1.1, 0.05, M.dark); post.position.set(0.0, 1.2, z); g.add(post); }
+  const roof = box(0.7, 0.05, 0.72, M.dark); roof.position.set(-0.2, 1.75, 0); g.add(roof);
+  for (const z of [-0.2, 0.2]) { const mast = box(0.08, 2.0, 0.08, M.dark); mast.position.set(0.52, 1.0, z); g.add(mast);
+    const fork = box(0.75, 0.04, 0.09, M.deck); fork.position.set(0.9, 0.12, z); g.add(fork); }
+  const pal = box(0.8, 0.12, 0.8, M.pallet); pal.position.set(0.92, 0.2, 0); g.add(pal);
+  const load = box(0.7, 0.5, 0.7, M.box); load.position.set(0.92, 0.51, 0); g.add(load);
+  for (const [x, z] of [[-0.45, -0.38], [-0.45, 0.38], [0.3, -0.38], [0.3, 0.38]]) {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.12, 20), M.dark); w.rotation.x = Math.PI / 2; w.position.set(x, 0.16, z); g.add(w);
+  }
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 8), new THREE.MeshStandardMaterial({ color: 0xff9900, emissive: 0xff9900, emissiveIntensity: 3 }));
+  lamp.position.set(-0.2, 1.82, 0); g.add(lamp); g.userData.lamp = lamp;
+  g.traverse((o) => { o.castShadow = true; }); scene.add(g); return g;
+}
+
+// ------------------------------------------------------------------ data and playback
+let D = null, robots = {}, actors = {}, playing = true, speed = 5, T = 0, lastNow = performance.now(), cine = false;
+let selected = null, stats = null;
+
+async function load(runId) {
+  for (const o of [...scene.children]) scene.remove(o);
+  robots = {}; actors = {}; seed = 7;
+  const r = await fetch(S ? `data/replay/${runId}.json` : `/api/replay/${runId}`);
+  if (!r.ok) { toast("No replay data for this run."); return; }
+  D = await r.json();
+  $("stack").textContent = params.get("label") || `${D.stack} · ${D.world.replace(/^qr_/, "").replace(/_/g, " ")}`;
+  if (EMBED) { $("kp_rate").style.display = "none"; $("kp_calls").style.display = ""; }
+  const noPeople = !Object.keys(D.kinds || {}).length; // no workers or vehicles: hide people KPIs
+  $("kp_close").style.display = noPeople ? "none" : ""; $("k_contact").parentElement.style.display = noPeople ? "none" : "";
+  const site = buildSite(D.layout);
+  spawned = (D.spawns || []).map((o) => { const g = box(o.sx, o.h, o.sy, M.pallet); g.position.copy(P(o.x, o.y, o.h / 2));
+    g.rotation.y = o.yaw || 0; g.visible = false; scene.add(g); return [o.t, g]; });
+  Object.keys(D.robots).forEach((id, i) => { robots[id] = makeRobot(i, id); });
+  for (const [n, k] of Object.entries(D.kinds)) actors[n] = k === "worker" ? makeWorker() : makeForklift();
+  const span = Math.max(site.W, site.H), small = span < 30; // small sites: higher, more top-down view
+  camera.position.copy(small ? P(site.cx - site.W * 0.15, site.cy - site.H * 0.75, span * 0.95)
+                             : P(site.cx - site.W * 0.32, site.cy - site.H * 0.72, span * 0.46));
+  controls.target.copy(P(site.cx, site.cy, 0)); controls.update();
+  precompute(); T = 0; $("k_total").textContent = `/ ${D.tasks_total}`;
+  if (!EMBED) { const q = new URLSearchParams(location.search); q.set("run", runId); history.replaceState(null, "", "?" + q); }
+}
+
+function precompute() {
+  // per-frame: robot speed, heading, status; nearest person per robot; running KPIs
+  const n = D.t.length, ids = Object.keys(D.robots), workers = Object.keys(D.kinds).filter((k) => D.kinds[k] === "worker");
+  const broken = {}; for (const e of D.events) if (e.type === "disable_robot" && e.robot) broken[e.robot] = e.t;
+  const doneAt = {}; for (const id of ids) doneAt[id] = Infinity;
+  const legsByRobot = {}; for (const e of D.tasks) (legsByRobot[e.robot] ||= []).push(e);
+  stats = { speed: {}, yaw: {}, near: {}, closest: new Float32Array(n), contact: new Float32Array(n), dist: {} };
+  let closest = Infinity, contact = 0, calls = 0; const inCall = {};
+  stats.calls = new Float32Array(n);
+  for (const id of ids) { stats.speed[id] = new Float32Array(n); stats.yaw[id] = new Float32Array(n);
+    stats.near[id] = new Float32Array(n); stats.dist[id] = new Float32Array(n); }
+  for (let f = 0; f < n; f++) {
+    const dt = f ? D.t[f] - D.t[f - 1] : 0;
+    for (const id of ids) {
+      const p = D.robots[id][f], q = D.robots[id][Math.max(0, f - 1)];
+      if (!p || !q) continue;
+      const d = Math.hypot(p[0] - q[0], p[1] - q[1]), v = dt > 0 ? d / dt : 0;
+      stats.speed[id][f] = v; stats.dist[id][f] = (f ? stats.dist[id][f - 1] : 0) + d;
+      stats.yaw[id][f] = d > 0.004 ? Math.atan2(p[1] - q[1], p[0] - q[0]) : (f ? stats.yaw[id][f - 1] : 0);
+      let near = Infinity;
+      for (const w of workers) { const a = D.actors[w][f]; if (a) near = Math.min(near, Math.hypot(a[0] - p[0], a[1] - p[1])); }
+      stats.near[id][f] = near;
+      if (near < closest && D.t[f] > 2) closest = near;
+      if (near < 0.45 && v > 0.05) contact += dt;
+    }
+    stats.closest[f] = closest; stats.contact[f] = contact;
+    for (const id of ids) { // close-call episodes: a person comes within 1 m of a robot (ends beyond 1.2 m)
+      const nr = stats.near[id][f], key = id;
+      if (nr < 1.0 && !inCall[key]) { inCall[key] = true; calls += 1; } else if (nr > 1.2) inCall[key] = false;
+    }
+    stats.calls[f] = calls;
+  }
+  stats.broken = broken; stats.legs = legsByRobot;
+}
+
+function frameAt(t) { // index i and blend a with t between D.t[i] and D.t[i+1]
+  const ts = D.t; let lo = 0, hi = ts.length - 1;
+  if (t <= ts[0]) return [0, 0]; if (t >= ts[hi]) return [hi, 0];
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ts[m] <= t) lo = m; else hi = m; }
+  return [lo, (t - ts[lo]) / (ts[lo + 1] - ts[lo])];
+}
+const lerp = (a, b, k) => a + (b - a) * k;
+function lerpAngle(a, b, k) { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return a + d * k; }
+
+const actorYaw = {};
+function update(t) {
+  for (const [t0, g] of spawned) g.visible = t >= t0;
+  const [i, k] = frameAt(t), j = Math.min(i + 1, D.t.length - 1);
+  for (const [id, g] of Object.entries(robots)) {
+    const a = D.robots[id][i], b = D.robots[id][j] || a; if (!a) continue;
+    g.position.copy(P(lerp(a[0], b[0], k), lerp(a[1], b[1], k), 0));
+    g.rotation.y = lerpAngle(stats.yaw[id][i], stats.yaw[id][j], k);
+    const v = stats.speed[id][i], broken = stats.broken[id] !== undefined && t >= stats.broken[id];
+    const legs = stats.legs[id] || [], done = legs.filter((e) => e.t <= t).length, total = (D.tasks_total / Object.keys(robots).length) | 0;
+    const finished = legs.length && done === legs.length && legs[legs.length - 1].t <= t;
+    const state = broken ? "broken" : finished ? "done" : v > 0.03 ? "driving" : "waiting";
+    const col = { broken: 0xef4444, done: 0x64748b, driving: 0x22c55e, waiting: 0xf59e0b }[state];
+    for (const o of [g.userData.ring, g.userData.beacon]) { o.material.color.setHex(col); o.material.emissive.setHex(col); }
+    const near = stats.near[id][i];
+    g.userData.halo.material.opacity = near < 1.0 ? (near < 0.45 ? 0.9 : 0.45) : 0;
+    g.userData.halo.material.color.setHex(near < 0.45 ? 0xef4444 : 0xf59e0b);
+    g.userData.state = { state, v, done, near, dist: stats.dist[id][i], total };
+  }
+  for (const [n, g] of Object.entries(actors)) {
+    const a = D.actors[n][i], b = D.actors[n][j] || a; if (!a) continue;
+    const x = lerp(a[0], b[0], k), y = lerp(a[1], b[1], k);
+    const prev = g.userData.prev; g.position.copy(P(x, y, 0));
+    if (prev && Math.hypot(x - prev[0], y - prev[1]) > 0.003) actorYaw[n] = Math.atan2(y - prev[1], x - prev[0]);
+    g.rotation.y = actorYaw[n] || 0; g.userData.prev = [x, y];
+    if (g.userData.legs) g.userData.legs.scale.y = 1 + 0.04 * Math.sin(t * 9);
+  }
+  const done = D.tasks.filter((e) => e.ok && e.t <= t).length;
+  $("k_tasks").textContent = done;
+  $("k_rate").textContent = t > 20 ? Math.round(done / (t / 3600)) : "–";
+  $("k_close").textContent = Number.isFinite(stats.closest[i]) ? stats.closest[i].toFixed(2) : "–";
+  $("k_contact").textContent = stats.contact[i].toFixed(1);
+  $("k_calls").textContent = stats.calls[i] | 0;
+  if (EMBED) caption(t, i, done);
+  const mm = Math.floor(t / 60), ss = Math.floor(t % 60);
+  $("clock").textContent = `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")} / ${fmt(D.t[D.t.length - 1])}`;
+  if (!scrubbing) $("scrub").value = Math.round((t / D.t[D.t.length - 1]) * 1000);
+  for (const e of D.events) if (e.type === "disable_robot" && Math.abs(t - e.t) < 0.6 * speed / 5 + 0.3)
+    toast(`${e.robot.replace("amr_", "Robot ")} broke down`);
+  card();
+}
+const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+function card() {
+  const id = selected || Object.keys(robots)[0]; if (!id) return;
+  const s = robots[id].userData.state; if (!s) return;
+  const names = { driving: "Driving to its next station", waiting: "Waiting for space or a person to pass",
+                  done: "Shift tasks complete", broken: "Broken down: the others carry on" };
+  $("c_name").textContent = id.replace("amr_", "Robot ") + (selected || document.body.classList.contains("export") ? "" : "  (click a robot)");
+  $("c_state").innerHTML = `<span style="color:${{ driving: "#22c55e", waiting: "#f59e0b", done: "#94a3b8", broken: "#ef4444" }[s.state]}">● </span>${names[s.state]}`;
+  $("c_speed").textContent = `${s.v.toFixed(2)} m/s`; $("c_tasks").textContent = `${s.done}`;
+  $("c_near").textContent = Number.isFinite(s.near) ? `${s.near.toFixed(2)} m` : "–"; $("c_dist").textContent = `${s.dist.toFixed(1)} m`;
+}
+
+let toastTimer = 0;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.style.display = "none"), 3500); }
+
+// ------------------------------------------------------------------ UI
+let scrubbing = false;
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Pause" : "Play"; };
+for (const b of document.querySelectorAll("[data-s]")) b.onclick = () => {
+  speed = +b.dataset.s; for (const o of document.querySelectorAll("[data-s]")) o.classList.toggle("on", o === b); };
+$("scrub").oninput = (e) => { scrubbing = true; T = (e.target.value / 1000) * D.t[D.t.length - 1]; };
+$("scrub").onchange = () => { scrubbing = false; };
+$("cine").onclick = () => { cine = !cine; $("cine").classList.toggle("on", cine); };
+addEventListener("keydown", (e) => { if (e.key === " ") $("play").click(); if (e.key.toLowerCase() === "c") $("cine").click(); });
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+renderer.domElement.addEventListener("click", (e) => {
+  mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(mouse, camera);
+  for (const h of ray.intersectObjects(Object.values(robots), true)) { let o = h.object;
+    while (o && !o.userData.id) o = o.parent; if (o) { selected = o.userData.id; card(); return; } }
+});
+
+
+// ------------------------------------------------------------------ "What's happening now" (embed)
+const RN = (id) => id.replace("amr_", "Robot ");
+let capMsg = "", capUntil = -1, capT = -1;
+function say(msg, t, hold = 2.5) { if (msg !== capMsg) { capMsg = msg; $("caption").textContent = msg; } capUntil = t + hold; }
+function caption(t, i, done) {
+  if (Math.abs(t - capT) > 8) capUntil = -1; // jumped (scrub/sync): re-evaluate now
+  capT = t;
+  const ids = Object.keys(robots), end = D.t[D.t.length - 1];
+  const live = LIVE ? "Live from the simulator. " : "";
+  // 1. a robot broke down (keep it on screen for a while)
+  for (const e of D.events) if (e.type === "disable_robot" && e.robot && t >= e.t && t < e.t + 12)
+    return say(`${live}${RN(e.robot)} broke down. Watch what the other robots do.`, t, 3);
+  if (t < capUntil) return;
+  // 2. a person very close to a moving robot
+  for (const id of ids) { const s = robots[id].userData.state; if (s && s.near < 0.45 && s.state !== "broken")
+    return say(`${live}Close call: a person is within 0.45 m of ${RN(id)}.`, t); }
+  // 3. a robot waiting for a person
+  for (const id of ids) { const s = robots[id].userData.state; if (s && s.state === "waiting" && s.near < 1.6)
+    return say(`${live}${RN(id)} waits: a worker is close.`, t); }
+  // 4. a robot waiting for another robot
+  for (const id of ids) { const s = robots[id].userData.state; if (!s || s.state !== "waiting") continue;
+    const p = robots[id].position;
+    for (const o of ids) if (o !== id && robots[o].position.distanceTo(p) < 1.6)
+      return say(`${live}${RN(id)} waits to let ${RN(o)} pass.`, t); }
+  // 5. the forklift stops for a worker
+  for (const [n, g] of Object.entries(actors)) { if (D.kinds[n] !== "forklift") continue;
+    const a = D.actors[n][i], b = D.actors[n][Math.max(0, i - 3)]; if (!a || !b) continue;
+    if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.02) for (const [w, k] of Object.entries(D.kinds)) { if (k !== "worker") continue;
+      const c = D.actors[w][i]; if (c && Math.hypot(c[0] - a[0], c[1] - a[1]) < 2.6) return say(`${live}The forklift stops and lets a worker pass.`, t); } }
+  // 6. a task was just finished
+  const recent = D.tasks.filter((e) => e.ok && e.t <= t && e.t > t - 3);
+  if (recent.length) return say(`${live}${RN(recent[recent.length - 1].robot)} finished a task (${done} of ${D.tasks_total} done).`, t);
+  if (!LIVE && t >= end - 0.5) return say(`Shift over: ${done} of ${D.tasks_total} tasks done in ${fmt(end)}.`, t, 99);
+  const moving = ids.filter((id) => robots[id].userData.state && robots[id].userData.state.state === "driving").length;
+  say(`${live}${moving} of ${ids.length} robots driving to their next station.`, t, 1.5);
+}
+
+// ------------------------------------------------------------------ live mode (live=1): follow a running shift
+let liveTimer = null;
+async function liveRefresh(runId) {
+  try {
+    const r = await fetch(`/api/replay/${runId}`); if (!r.ok) return;
+    const N = await r.json();
+    if (!D) { await load(runId); return; }
+    Object.assign(D, { t: N.t, robots: N.robots, actors: N.actors, tasks: N.tasks, events: N.events, metrics: N.metrics });
+    precompute();
+  } catch (e) { /* simulator still starting */ }
+}
+
+// ------------------------------------------------------------------ frame rate and automatic low quality
+let fpsN = 0, fpsT0 = performance.now(), fps = 0, lowChecked = LOWQ;
+function fpsTick(now) {
+  fpsN++; if (now - fpsT0 < 2000) return;
+  fps = fpsN * 1000 / (now - fpsT0); fpsN = 0; fpsT0 = now;
+  if (!lowChecked && D && fps < 24 && !EXPORT) { // weak GPU: drop the expensive parts once
+    lowChecked = true; LOWQ = true; renderer.shadowMap.enabled = false; renderer.setPixelRatio(1);
+    scene.traverse((o) => { if (o.isPointLight) o.visible = false; if (o.isLight && o.castShadow) o.castShadow = false; });
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; });
+  } else if (D) lowChecked = true;
+}
+// automatic camera in Studio: slow orbit around the site until someone drags the view
+let autoCam = EMBED && params.get("cam") !== "free", camIdleUntil = 0;
+controls.addEventListener("start", () => { autoCam = false; camIdleUntil = performance.now() + 20000; });
+
+let orbit = 0;
+// Export mode (?export=1&from=0&to=END&speed=10&fps=30): fixed time steps, each frame posted to the server.
+const EXPORT = params.get("export") ? { fps: +(params.get("fps") || 30), speed: +(params.get("speed") || 10),
+  from: +(params.get("from") || 0), to: params.get("to") ? +params.get("to") : null, n: 0, busy: false } : null;
+async function exportStep() {
+  if (EXPORT.busy || !D) return; EXPORT.busy = true;
+  if (EXPORT.n === 0) { T = EXPORT.from; playing = false; document.body.classList.add("export"); }
+  const end = EXPORT.to ?? D.t[D.t.length - 1];
+  update(T);
+  if (cine) cineStep(1 / EXPORT.fps);
+  controls.update(); renderer.render(scene, camera);
+  const blob = await new Promise((r) => renderer.domElement.toBlob(r, "image/png"));
+  await fetch(`/api/replay/${D.run_id}/frame/${EXPORT.n}`, { method: "POST", body: blob });
+  EXPORT.n += 1; T += EXPORT.speed / EXPORT.fps;
+  if (T > end) { await fetch(`/api/replay/${D.run_id}/encode?fps=${EXPORT.fps}`, { method: "POST" });
+    document.title = "EXPORT DONE"; EXPORT.done = true; }
+  EXPORT.busy = false;
+}
+function cineStep(dt) {
+  orbit += dt * 0.12; const id = selected || Object.keys(robots)[0], tgt = robots[id].position;
+  controls.target.lerp(tgt, 0.03);
+  const r = 4.5, want = new THREE.Vector3(tgt.x + r * Math.cos(orbit), 2.6, tgt.z + r * Math.sin(orbit));
+  camera.position.lerp(want, 0.02);
+}
+function tick(now) {
+  if (EXPORT) { if (!EXPORT.done) exportStep(); requestAnimationFrame(tick); return; }
+  const dt = Math.min(0.1, (now - lastNow) / 1000); lastNow = now; fpsTick(now);
+  if (EMBED && !autoCam && camIdleUntil && now > camIdleUntil && params.get("cam") !== "free") { autoCam = true; camIdleUntil = 0; }
+  if (D && LIVE) { const e = D.t[D.t.length - 1]; T = Math.max(e - 3, Math.min(T + dt, e - 1)); update(T); if (autoCam) overviewStep(dt); }
+  else if (D) {
+    if (playing && !scrubbing) T = Math.min(T + dt * speed, D.t[D.t.length - 1]);
+    update(T);
+    if (cine) cineStep(dt); // slow orbit around the selected robot
+    else if (autoCam) overviewStep(dt * 0.6);
+  }
+  controls.update(); renderer.render(scene, camera); requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+if (LIVE) { playing = true; await liveRefresh(params.get("run")); liveTimer = setInterval(() => liveRefresh(params.get("run")), 1000); }
+const runs = (EMBED || LIVE) ? [] : await (await fetch(S ? "data/replay/runs.json" : "/api/replay/runs")).json();
+const want = params.get("run");
+if (want && !runs.some((r) => r.run_id === want)) runs.unshift({ run_id: want, stack: "selected run", robots: "?" });
+$("runs").innerHTML = runs.map((r) => `<option value="${r.run_id}">${r.run_id.slice(0, 16).replace("T", " ")} · ${r.stack} · ${r.robots} robots</option>`).join("");
+const first = params.get("run") || (runs[0] && runs[0].run_id);
+if (first && !LIVE) { $("runs").value = first; await load(first); if (EMBED) { playing = !!params.get("autoplay"); }
+  if (params.get("t")) { T = +params.get("t"); playing = false; $("play").textContent = "Play"; }
+  if (params.get("cine")) { cine = true; $("cine").classList.add("on"); }
+  if (params.get("robot")) selected = params.get("robot"); }
+$("runs").onchange = (e) => load(e.target.value);
+let site0 = null;
+function overviewStep(dt) { // slow orbit around the whole site
+  orbit += dt * 0.05; const L = D.layout.bounds, cx = (L.x_min + L.x_max) / 2, cy = (L.y_min + L.y_max) / 2;
+  const span = Math.max(L.x_max - L.x_min, L.y_max - L.y_min), R = span * (EMBED ? 0.7 : 0.62), h = R * (EMBED ? 0.95 : 0.62);
+  const want = new THREE.Vector3(cx + R * Math.cos(orbit + 3.9), h, -cy + R * Math.sin(orbit + 3.9));
+  const k = overviewSnap ? 1 : 0.05; overviewSnap = false;
+  controls.target.lerp(P(cx, cy, 0), k); camera.position.lerp(want, k);
+}
+let overviewSnap = EMBED;
+window.__qr = { setT: (t) => { T = t; }, play: (p) => { playing = p; }, getT: () => T, fps: () => fps, lowq: () => LOWQ,
+  playing: () => playing, setSpeed: (v) => { speed = v; }, cam: camera, controls, P,
+  ready: () => !!D && !!stats, duration: () => D.t[D.t.length - 1],
+  // deterministic frame for video export: mode "overview" or "follow"; returns nothing
+  frame: (t, dt, mode = "overview", robot = null) => {
+    playing = false; T = t; if (robot) selected = robot; update(T);
+    if (mode === "follow") cineStep(dt); else overviewStep(dt);
+    controls.update(); renderer.render(scene, camera); } };
+</script>
+</body>
+</html>
