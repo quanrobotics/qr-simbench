@@ -19,16 +19,18 @@ from typing import Any
 import numpy as np
 import yaml
 
+from qrsimbench import fleet_managers
+
 VIEWER = Path(__file__).parent / "viewer"
 LAYOUT_KEYS = ("bounds", "wall", "racks", "blocks", "clutter", "markings", "stations")
 ASSET_SIZE = {"pallet": (1.2, 0.8, 0.5), "box": (0.4, 0.4, 0.5)}  # simulation/models/*/model.sdf
-LABELS = {"rmf": "Open-RMF", "free_fleet": "free_fleet", "mapf": "Route planning (MAPF)"}
 HZ = 5.0  # replay frames per second of simulated time (the browser interpolates between frames)
 
 
 def stack_label(sc: dict[str, Any]) -> str:
-    if sc.get("fleet_manager") in LABELS:
-        return LABELS[sc["fleet_manager"]]
+    ext = fleet_managers.label(sc["fleet_manager"]) if sc.get("fleet_manager") not in (None, "qr") else None
+    if ext:
+        return ext
     if not sc.get("fleet"):
         return "Nav2"
     return "Nav2 fleet"

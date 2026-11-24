@@ -52,7 +52,7 @@ class World(Strict):
     actor_speed_scale: float = Field(default=1.0, gt=0)  # scales moving workers / vehicles
     non_yielding_actors: list[str] = Field(default_factory=list)  # actors that never yield to robots
     actor_yield_probability: float = Field(default=1.0, ge=0, le=1)  # crowd: yield per encounter
-    vehicles_yield_to_workers: bool = False  # forklifts also stop for workers (off: benchmark runs)
+    vehicles_yield_to_workers: bool = False  # forklifts also stop for workers (off by default)
 
 
 class Navigation(Strict):
@@ -186,9 +186,9 @@ class Scenario(Strict):
     mission: Mission
     fleet: list[FleetMember] = Field(default_factory=list)
     fleet_policy: FleetPolicy = Field(default_factory=FleetPolicy)
-    # Who coordinates the fleet: QR's commanders ("qr"), Open-RMF ("rmf"), free_fleet ("free_fleet") or
-    # the MAPF baseline ("mapf": prioritized planning + action-dependency execution).
-    fleet_manager: Literal["qr", "rmf", "free_fleet", "mapf"] = "qr"
+    # Who coordinates the fleet: the built-in mission commanders ("qr", optionally with a fleet layer plugin)
+    # or an external fleet manager registered under the qrsimbench.fleet_managers entry point.
+    fleet_manager: str = Field(default="qr", pattern=r"^[a-z][a-z0-9_]*$")
     events: list[Event] = Field(default_factory=list)
     recording: Recording = Field(default_factory=Recording)
     metrics: list[str] = Field(default_factory=lambda: sorted(KNOWN_METRICS))

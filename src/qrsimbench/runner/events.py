@@ -1,4 +1,4 @@
-"""Scenario event executor for fleet runs, independent of the fleet manager (QR or Open-RMF).
+"""Scenario event executor for fleet runs, independent of the fleet manager.
 
     python -m qrsimbench.runner.events RUN_DIR
 
