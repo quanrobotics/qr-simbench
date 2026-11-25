@@ -64,6 +64,10 @@
   @media (max-width: 760px) { body.embed #kpis { flex-wrap:nowrap; } body.embed .kpi { flex:0 1 auto; }
     #kpis { flex-wrap:wrap; right:14px; } .kpi { min-width:0; flex:1 1 40%; }
     #controls { right:14px; bottom:150px; } #card { left:14px; width:auto; } #legend { display:none; }
+    body:not(.embed) #brand { display:none; } body:not(.embed) #pick { left:10px; right:10px; top:10px; }
+    body:not(.embed) #pick select { flex:1; min-width:0; } body:not(.embed) #kpis { top:58px; left:10px; right:10px; }
+    body:not(.embed) #card { bottom:10px; left:10px; right:10px; padding:8px 12px; } body:not(.embed) #card table { display:none; }
+    body:not(.embed) #controls { left:10px; right:10px; bottom:78px; flex-wrap:wrap; }
   }
 </style>
 <script type="importmap">{ "imports": { "three": "./static/vendor/three/three.module.js" } }</script>
@@ -343,6 +347,11 @@ async function load(runId) {
   const r = await fetch(S ? `data/replay/${runId}.json` : `/api/replay/${runId}`);
   if (!r.ok) { toast("No replay data for this run."); return; }
   D = await r.json();
+  const lastTask = Math.max(0, ...(D.tasks || []).map((e) => e.t));
+  if (D.t && D.t.length && lastTask > D.t[D.t.length - 1]) {
+    D.t.push(+(lastTask + 0.5).toFixed(2));
+    for (const tr of [...Object.values(D.robots || {}), ...Object.values(D.actors || {})]) if (Array.isArray(tr) && tr.length) tr.push(tr[tr.length - 1]);
+  }
   $("stack").textContent = params.get("label") || `${D.stack} · ${D.world.replace(/^qr_/, "").replace(/_/g, " ")}`;
   if (EMBED) { $("kp_rate").style.display = "none"; $("kp_calls").style.display = ""; }
   const noPeople = !Object.keys(D.kinds || {}).length; // no workers or vehicles: hide people KPIs
@@ -587,7 +596,10 @@ if (LIVE) { playing = true; await liveRefresh(params.get("run")); liveTimer = se
 const runs = (EMBED || LIVE) ? [] : await (await fetch(S ? "data/replay/runs.json" : "/api/replay/runs")).json();
 const want = params.get("run");
 if (want && !runs.some((r) => r.run_id === want)) runs.unshift({ run_id: want, stack: "selected run", robots: "?" });
-$("runs").innerHTML = runs.map((r) => `<option value="${r.run_id}">${r.run_id.slice(0, 16).replace("T", " ")} · ${r.stack} · ${r.robots} robots</option>`).join("");
+const runLabel = (r) => { const m = r.run_id.match(/^(\d{4}-\d{2}-\d{2})T(\d{2})(\d{2})\d*_(.*)$/);
+  const name = m ? m[4].replace(/^studio_/, "").replace(/_[0-9a-f]{6}$/, "").replace(/_/g, " ") : r.run_id;
+  return `${name} · ${r.stack} · ${r.robots} robot${r.robots == 1 ? "" : "s"}${m ? ` · ${m[1]} ${m[2]}:${m[3]}` : ""}`; };
+$("runs").innerHTML = runs.map((r) => `<option value="${r.run_id}">${runLabel(r)}</option>`).join("");
 const first = params.get("run") || (runs[0] && runs[0].run_id);
 if (first && !LIVE) { $("runs").value = first; await load(first); if (EMBED) { playing = !!params.get("autoplay"); }
   if (params.get("t")) { T = +params.get("t"); playing = false; $("play").textContent = "Play"; }
